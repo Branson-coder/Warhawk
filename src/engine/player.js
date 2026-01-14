@@ -85,7 +85,7 @@ export default class Player {
                     -500
                 )
             );
-             this.gunShot.currentTime = 1.9
+             this.gunShot.currentTime = 0.09;
              this.gunShot.play();
         });
 

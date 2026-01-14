@@ -10,10 +10,10 @@ export default class Spawner {
     this.patternDur = 0;
     
     this.pending = [];
-    this.patternBook = [funcs.hover];
+    this.patternBook = Object.values(funcs);
     console.log(funcs);
 console.log(this.patternBook);
-console.log(typeof this.patternBook[0]); // should print "function"
+//console.log(typeof this.patternBook[0]); // should print "function"
   }
 
 
@@ -36,8 +36,7 @@ console.log(typeof this.patternBook[0]); // should print "function"
 
   startPattern(){
     this.patternTimer = 0;
-
-    const pick = this.patternBook[0];
+    const pick = this.patternBook[Math.floor(Math.random() * this.patternBook.length)];
     this.currPattern = pick;
 
     this.patternDur= pick(this);
@@ -50,6 +49,7 @@ console.log(typeof this.patternBook[0]); // should print "function"
       if(this.pending[i].delay <= 0){
         this.game.entities.add(this.pending[i].enemy);
         this.pending.splice(i, 1);
+          console.log("yo i spawned");
       }
     }
   }

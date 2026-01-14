@@ -1,6 +1,7 @@
 // src/Enemy.js
 import Collider from "./Collider.js";
 import EnemyBullet from "./EnemyBullet.js";
+import {spawnBullet} from "./shootingPatterns.js";
 
 export default class Enemy {
   constructor(opts = {}) {
@@ -16,11 +17,10 @@ export default class Enemy {
     this.timeAlive = 0;
     this.game = opts.game ?? null;
     this.pattern = opts.pattern ?? null;
-    this.fireTimer = opts.fireTimer ?? 3; 
-    this.bullImg1 = new Image(); this.bullImg1.src= "./src/engine/assets/lFaShM (1).png";
-    this.bullImg2 = new Image(); this.bullImg2.src= "./src/engine/assets/lFaShM.png";
+    this.fireTimer = opts.fireTimer ?? 3; this.tempTimer = this.fireTimer; 
     this.collider = Collider;
-    this.colourTimer = 0;
+    this.shotsPattern = opts.shotsPattern ?? 1;
+    this.colourTimer = 0; this.hitTimer = 0; this.hitDuration = 0.1;
     this.original = this.colour;
     this.spritesheet = opts.spritesheet ?? null;
 
@@ -31,11 +31,17 @@ export default class Enemy {
     this.frameRate = opts.frameRate ?? 0.1;
     this.roate = opts.rotate ?? 0;
 
+    this.burstQueue = [];      
+    this.burstInterval = 0.1;  
+    this.burstTimer = 0; 
+
     this.preX = this.x;
     this.preY = this.y;
     this.spriteDir = "center";
 
     this.rotationMode = opts.rotationMode ?? "curved";
+    this.shootingPattern = opts.shootingPattern ?? null;
+    this.canShoot = opts.canShoot ?? 1.0;
 
     this.directionAngle = opts.directionAngle ?? Math.PI;
     this.bankAngle = 0;
@@ -83,7 +89,7 @@ export default class Enemy {
 
    if (this.rotationMode === "curved") {
     const dx = this.x - this.preX;
-    const BANK_ANGLE = Math.PI / 16;
+    const BANK_ANGLE = Math.PI/16;
     const SMOOTH = 0.02;
     
     const flip = (this.directionAngle === Math.PI) ? -1 : 1;
@@ -96,6 +102,7 @@ export default class Enemy {
     this.bankAngle += (flip * Ang - this.bankAngle)*SMOOTH; 
 
     this.preX = this.x;
+    
 }else if(this.rotationMode == "diagonal"){
     const movementAngle = Math.atan2(this.diag.vy, this.diag.vx) - Math.PI / 2;
 
@@ -134,49 +141,32 @@ export default class Enemy {
 
     }
   
-   
+    
     this.fireTimer -= dt;
     if (this.fireTimer <= 0) {
-      this.fireTimer = 3;
-      this.enemyShoot(game);
+      this.fireTimer = this.tempTimer;
+      if(this.shootingPattern){
+        this.shootingPattern(game, this);
+      }else{
+        console.log("shit aint working");
+      }
+
+    }
+       for(let i = this.burstQueue.length - 1; i >= 0; i--){
+        this.burstQueue[i].delay -= dt;
+          if(this.burstQueue[i].delay <= 0){
+            spawnBullet(game, this, this.burstQueue[i].dx, this.burstQueue[i].dy);
+            this.burstQueue.splice(i, 1);
+        }
     }
 
     if (this.y > (game.h) || this.y < -60 || this.x > game.w + 60 || this.x < -60) this.despawn = true;
   }
 
   enemyShoot(game) {
-    if (!game || !game.player) return;
 
-    const px = game.player.x + game.player.width / 2;
-    const py = game.player.y + game.player.height / 2;
-
-    const ex = this.x + this.w / 2;
-    const ey = this.y + this.h / 2;
-    let dx = px - ex;
-    let dy = py - ey;
-
-    const len = Math.hypot(dx, dy) || 1;
-    dx /= len;
-    dy /= len;
-
-
-    const baseSpeed = 110;
-    const enemySpeed = Math.hypot(this.vx || 0, this.vy || 0);  
-
-    const finalSpeed = baseSpeed + enemySpeed * 0.5;
-
-    const vx = dx * finalSpeed;
-    const vy = dy * finalSpeed;
-    let img = new Image();
-    if(this.rotationMode == "diagonal"){
-      img = this.bullImg1;
-    }else{
-      img = this.bullImg2;
-    }
-
-    const b = new EnemyBullet(ex - 3, ey - 3, vx, vy, img);
-    game.entities.add(b);
   }
+
 
  draw(ctx) {
        ctx.save();
@@ -194,6 +184,8 @@ export default class Enemy {
         ctx.fill();
 
   ctx.restore();
+
+
 
   if (this.frames.length === 0) return;
     let img;
