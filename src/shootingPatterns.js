@@ -89,9 +89,16 @@ export function burst(game, enemy){
   const len = Math.hypot(dx, dy);
   dx /= len;
   dy /= len;
-  
   enemy.burstQueue = [];
-  for(let i = 0; i < 2; i++){
+
+  for(let i = 0; i < enemy.burstRounds; i++){
+    dx += (Math.random() * 2 - 1) * 0.3;
+    dy += (Math.random() * 2 - 1) * 0.3;
+
+    const len = Math.hypot(dx, dy) || 1;
+    dx /= len;
+    dy /= len;
+
     enemy.burstQueue.push({dx, dy, delay:i * 0.1});
   }
 

@@ -30,9 +30,21 @@ export function curved(en, dt, game){
     t * t * c.end.y;  
 }
 
-export function straight(en, dt, game) {
-  en.x += Math.sin(en.timeAlive * (en._sineFreq ?? 2.5)) * (en._sineAmp ?? 60) * dt;
-  en.y += en.speed * dt;
+export function miniBoss(en, dt, game) {
+  if(en.phase == "enter"){
+    en.y += en.speed *dt;
+
+    if(en.y >= 50){
+      en.phase = "locked";
+    }
+
+  }else if(en.phase == "locked"){
+    en.y += en.speed * dt;
+    if(en.speed > 0){
+      en.speed -= dt * 10;
+    }
+      
+  }
 }
 
 export function diveThenExit(en, dt, game) {
@@ -71,15 +83,24 @@ export function followPlayer(en, dt, game) {
     en.y += en.speed * dt;
     return;
   }
-  // move toward player's current position slowly
+  
   const px = game.player.x + game.player.width / 2;
   const py = game.player.y + game.player.height / 2;
+  
+  const dist = 200;
+
   let dx = px - (en.x + en.w / 2);
   let dy = py - (en.y + en.h / 2);
   const len = Math.hypot(dx, dy) || 1;
-  dx /= len;
-  dy /= len;
-  en.x += dx * (en._followSpeed ?? 120) * dt;
-  en.y += dy * (en._followSpeed ?? 120) * dt;
+
+  if(len > dist){
+    dx /= len;
+    dy /= len;
+    en.x += dx * (en._followSpeed ?? 120) * dt;
+    en.y += dy * (en._followSpeed ?? 120) * dt; 
+  }else{
+    en.x += Math.sin(en.timeAlive * 2.0) * (Math.random() * (100 - 69) + 60) * dt;
+  }
+  
 }
 

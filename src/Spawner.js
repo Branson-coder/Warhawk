@@ -1,4 +1,4 @@
-import powerUp from "./powerups.js"
+import powerUp from "./powerups.js";
 import * as funcs from "./spawnPatterns.js"
 
 export default class Spawner {
@@ -8,6 +8,10 @@ export default class Spawner {
     this.currPattern = null;
     this.patternTimer = 0;
     this.patternDur = 0;
+
+    this.powerUp = new powerUp();
+    this.powerUpSpawns = false;
+    this.powerUpAssigned = false;
     
     this.pending = [];
     this.patternBook = Object.values(funcs);
@@ -31,12 +35,16 @@ console.log(this.patternBook);
   }
   this.spawnPending(dt);
   
+  if(this.game.score > 0 && this.game.score % 10){
+    
+  }
 
   }
 
   startPattern(){
     this.patternTimer = 0;
-    const pick = this.patternBook[Math.floor(Math.random() * this.patternBook.length)];
+    const pick = funcs.spawnHeli;
+    // this.patternBook[Math.floor(Math.random() * this.patternBook.length)]
     this.currPattern = pick;
 
     this.patternDur= pick(this);
@@ -54,5 +62,8 @@ console.log(this.patternBook);
     }
   }
 
+  spawnPowerUp(x, y){
+    
+  }
 
 }

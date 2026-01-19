@@ -1,7 +1,7 @@
 import Collider from "./Collider.js";
 export default class powerUp{
     constructor(x, y){
-        this.x  = x; this.y = y;
+        this.x = x; this.y = y;
         this.type = 'powerUp';
         this.despawn = false;
         this.collider = Collider;

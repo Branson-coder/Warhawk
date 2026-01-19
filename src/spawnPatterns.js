@@ -15,15 +15,21 @@ export function spawnDiagonal(spawner){
 
         const fromLeft = Math.random() < 0.5;
         const startX = fromLeft ? -50 : spawner.game.w + 50;
-        const startY = Math.random() * spawner.game.h * 0.3;
-
-        const angle = fromLeft ?  Math.PI/4 : (3 * Math.PI)/4;
+        const startY = Math.random() * (spawner.game.h * 0.75 - spawner.game.h * 0.25) + spawner.game.h*0.25
+        const goingUp = Math.random() < 0.5;
+        let angle;
+        if(fromLeft){
+          angle = goingUp ? -Math.PI/8 : Math.PI/4;
+        }else{
+          angle = goingUp ? -(3 * Math.PI)/8 : (3 * Math.PI)/4;
+        }
+        
         
         for(let i = 0; i < 6; i++){
           const enemy = new Enemy({
             x:startX, y:startY, w:60, h:60, game:spawner.game, frames:frameImg,
             speed:110,
-            fireTimer: 4.0, shootingPattern:basic, canShoot: Math.random() < 0.25,
+            shootingPattern:basic, canShoot: Math.random() < 0.25,
             pattern:Patterns.diagonal,
             rotationMode: "diagonal",
             directionAngle: fromLeft ?  -Math.PI/2 : Math.PI/2
@@ -53,7 +59,7 @@ export function spawnHeli(spawner){
             
             
             let startX1 = 0; let flip = 1;
-              for(let i = 0; i < 5; i++){
+              for(let i = 0; i < 3; i++){
 
                 if(flip == 1){
                     startX1 = 20;
@@ -61,11 +67,13 @@ export function spawnHeli(spawner){
                     startX1 = spawner.game.w - 150;
                 }
                 const enemy = new Enemy({
-                x:startX1, y:-50, game: spawner.game, frames: frameImg1, pattern:Patterns.zigZag, frameCount:5,
-                zigAmp: Math.random() * 60 + 60, zigFreq: Math.random() * 0 + 3,
+                x:startX1, y:-50, game: spawner.game, frames: frameImg1, pattern:Patterns.followPlayer, frameCount:5,
+                zigAmp: Math.random() * 60 + 60, zigAmp: Math.random() * 100,
                 shootingPattern: spray,
                 directionAngle: 0, angle: 0 
               })
+
+        
 
                 spawner.pending.push({
                   enemy,
@@ -74,7 +82,7 @@ export function spawnHeli(spawner){
                 
                 flip *= -1;
             }
-        return 6 * 3 + 2;
+        return 3 * 3 + 2;
 }
 
 export function spawnCurve(spawner){
@@ -88,9 +96,10 @@ export function spawnCurve(spawner){
         const flipX  = Math.random() < 0.5;
         const flipY = Math.random() < 0.5;
 
-        for(let i = 0; i < 6; i++){
+        for(let i = 0; i < 4; i++){
+          const sx = (Math.random() * (spawner.game.w - 50))
            const enemy = new Enemy({
-          x:Math.random() * spawner.game.w - 10, y:-50, w:60, h:60,
+          x:sx, y:-50, w:60, h:60,
           game:spawner.game, fireTimer: 2.0, frames:framesImg3, pattern:Patterns.curved,
           shootingPattern: burst,
           directionAngle: flipY ? 0 : Math.PI,
@@ -101,8 +110,8 @@ export function spawnCurve(spawner){
         enemy.curve ={
           t: 0,
           speed: 0.25,
-          start: { x: Math.random() * spawner.game.w - 10, y : flipY ? -50 : spawner.game.h + -50},
-          control: { x: flipX ? spawner.game.w * 1.2: spawner.game.w * 0.0, y: flipY ?  spawner.game.h * 0.1 : spawner.game.h * 0.1 },
+          start: { x: sx, y : flipY ? -50 : spawner.game.h + -50},
+          control: { x: flipX ? spawner.game.w * 1.25: spawner.game.w * 0.0, y: flipY ?  spawner.game.h * 0.5 : spawner.game.h * 0.5 },
           end: {x: spawner.game.w * 0.5, y: flipY ? spawner.game.h + 50 : -70}
         };
           spawner.pending.push({
@@ -115,11 +124,11 @@ export function spawnCurve(spawner){
 }
 
 export function  spawnSineCurve(spawner){
-  const img = new Image();
-  img.src = "./src/engine/assets/airplane3.png";
+  const img_mini = new Image();
+  img_mini.src = "./src/engine/assets/airplane3.png";
 
   const frameImg5 = {
-    center:img,
+    center:img_mini,
   };
  
   const fromLeft = Math.random() < 0.5;
@@ -139,7 +148,7 @@ export function  spawnSineCurve(spawner){
       t:0,
       speed:0.25,
       start: {x:sx, y :sy},
-      control: {x: -spawner.game.w * 1.0, y:spawner.game.h * 0.3},
+      control: {x: spawner.game.w * 0.3, y:spawner.game.h * 0.3},
       end:{x:sx, y:spawner.game.h + 50}
   };
 
@@ -154,3 +163,32 @@ export function  spawnSineCurve(spawner){
 
 }
 
+
+export function miniBoss(spawner){
+  const sx = Math.random() * spawner.game.w/2;
+  const sy = -50;
+
+  const img = new Image();
+  img.src = "./src/engine/assets/boss.png"
+
+  const framesMini = {
+    center: img
+  };
+
+  const enemy = new Enemy({
+    x:sx, y:sy,w:190, h:130, hp:1000, game:spawner.game, frames:framesMini, 
+    pattern:Patterns.miniBoss,
+    directionAngle:0,
+    speed:60,
+    shootingPattern:burst, fireTimer:1.5, burstSpread: Math.PI/12,
+    burstRounds:10
+  });
+
+  spawner.pending.push({
+    enemy,
+    delay : 0
+  });
+
+  return 7;  
+  
+}

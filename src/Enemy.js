@@ -12,12 +12,13 @@ export default class Enemy {
     this.hp = opts.hp ?? 110;
     this.colour = opts.colour ?? "blue";
     this.speed = opts.speed ?? 95; this.vx = 0; this.vy = this.speed, 
-    this.despawn = false;
+    this.despawn = false; this.dropPowerup = false;
     this.type = 'enemy';
     this.timeAlive = 0;
     this.game = opts.game ?? null;
     this.pattern = opts.pattern ?? null;
     this.fireTimer = opts.fireTimer ?? 3; this.tempTimer = this.fireTimer; 
+    this.hasShot = false;
     this.collider = Collider;
     this.shotsPattern = opts.shotsPattern ?? 1;
     this.colourTimer = 0; this.hitTimer = 0; this.hitDuration = 0.1;
@@ -29,15 +30,15 @@ export default class Enemy {
     this.frame = 0;
     this.frameTimer = 0;
     this.frameRate = opts.frameRate ?? 0.1;
-    this.roate = opts.rotate ?? 0;
+    this.roate = opts.rotate ?? 0; 
 
-    this.burstQueue = [];      
-    this.burstInterval = 0.1;  
+    this.burstQueue = []; this.burstRounds = opts.burstRounds ?? 2;    
+    this.burstInterval = 0.1; this.burstSpread = opts.Spread ?? 0;
     this.burstTimer = 0; 
 
     this.preX = this.x;
     this.preY = this.y;
-    this.spriteDir = "center";
+    this.spriteDir = "center"; this.phase = opts.phase ?? "enter";
 
     this.rotationMode = opts.rotationMode ?? "curved";
     this.shootingPattern = opts.shootingPattern ?? null;
@@ -95,8 +96,8 @@ export default class Enemy {
     const flip = (this.directionAngle === Math.PI) ? -1 : 1;
 
     let Ang = 0;
-    if (dx > 0.1) Ang = -BANK_ANGLE;
-    else if (dx < -0.1) Ang  = BANK_ANGLE;
+    if (dx > 0.4) Ang = -BANK_ANGLE;
+    else if (dx < -0.4) Ang  = BANK_ANGLE;
     
 
     this.bankAngle += (flip * Ang - this.bankAngle)*SMOOTH; 
@@ -141,7 +142,16 @@ export default class Enemy {
 
     }
   
-    
+    if(this.rotationMode == "diagonal"){
+      if(!this.hasShot && this.timeAlive >= 1.2){
+        if(this.shootingPattern){
+          this.shootingPattern(game, this);
+          this.hasShot = true;
+        }
+      }
+      
+    }else{
+
     this.fireTimer -= dt;
     if (this.fireTimer <= 0) {
       this.fireTimer = this.tempTimer;
@@ -158,6 +168,10 @@ export default class Enemy {
             spawnBullet(game, this, this.burstQueue[i].dx, this.burstQueue[i].dy);
             this.burstQueue.splice(i, 1);
         }
+    }
+
+
+
     }
 
     if (this.y > (game.h) || this.y < -60 || this.x > game.w + 60 || this.x < -60) this.despawn = true;
@@ -227,13 +241,23 @@ export default class Enemy {
     if(other.type == 'player' || other.type == 'playerBullet'){
       this.hp -= 10;
       if(this.hp <= 0){
-        this.despawn = true;
-        game.score += 1;
+        this.death(game);
       }
 
       this.colourTimer = 0.1;
       this.colour = "white";
 
     }
+  }
+
+  
+  death(game){
+    this.despawn = true;
+    game.score += 1;
+
+    if(this.dropPowerup){
+      
+    }
+
   }
 }
