@@ -16,6 +16,7 @@ export default class Player {
         this.fireRate = 0.12; this.fireTime = 0; 
 
         this.gunShot = new Audio('./src/engine/assets/playershot.mp3');
+        this.gunShot.volume = 0.1;
         this.snippetstart
 
         this.depsawn = false;
@@ -130,7 +131,10 @@ export default class Player {
 
         if(other.type == 'powerUp'){
             other.despawn = true
-            this.powerlvl += 1;
+              this.powerlvl = Math.min(
+              this.powerlvl + 1,
+              this.shots.length - 1
+          );
         }
     }
     

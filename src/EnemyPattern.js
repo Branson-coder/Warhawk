@@ -47,6 +47,31 @@ export function miniBoss(en, dt, game) {
   }
 }
 
+export function miniBoss2(en, dt, game){
+  
+  if((en.y >= game.h + en.h|| en.y <= -en.h - 50)){
+    en.phase = "locked";
+    en.speed *= -1;
+    en.miniBoss2Shift = Math.random() * 80 - 40;
+   
+    en.lockedTimer = 0.4;
+    en.directionAngle += Math.PI;
+  }
+
+  if(en.phase == "locked" ){
+    const change = Math.random() * game.w * 0.5;
+     en.x = change;
+    en.lockedTimer -= dt;
+
+    if(en.lockedTimer <= 0){
+      en.phase = "enter";
+    }
+  }
+
+  en.y += en.speed * dt;
+
+}
+
 export function diveThenExit(en, dt, game) {
   if (en.timeAlive < (en._diveTime ?? 1.2)) {
     // interpolate toward target
@@ -78,6 +103,7 @@ export function arcEntrance(en, dt, game) {
   en.y = cy + Math.sin(en.timeParam) * r * 0.5 + (en.timeAlive * 10);
 }
 
+
 export function followPlayer(en, dt, game) {
   if (!game || !game.player) {
     en.y += en.speed * dt;
@@ -87,20 +113,32 @@ export function followPlayer(en, dt, game) {
   const px = game.player.x + game.player.width / 2;
   const py = game.player.y + game.player.height / 2;
   
-  const dist = 200;
 
   let dx = px - (en.x + en.w / 2);
   let dy = py - (en.y + en.h / 2);
   const len = Math.hypot(dx, dy) || 1;
 
-  if(len > dist){
+  
     dx /= len;
     dy /= len;
-    en.x += dx * (en._followSpeed ?? 120) * dt;
-    en.y += dy * (en._followSpeed ?? 120) * dt; 
-  }else{
-    en.x += Math.sin(en.timeAlive * 2.0) * (Math.random() * (100 - 69) + 60) * dt;
-  }
-  
+
+
+    if(len > en._followDist ){
+      en.x += dx * (en._followSpeed ?? 120) *  dt;
+      en.y += dy * (en._followSpeed ?? 120) * dt; 
+
+      const pxv = -dy;
+      const pyv = dx;
+
+      const strafe = Math.sin(en.timeAlive * 7) * 100;
+
+      en.x += pxv * strafe * dt;
+      en.y += pyv * strafe * dt;
+    }else{
+      
+       en.x += Math.sin(en.timeAlive * (en._zigFreq ?? 7)) * (en._zigAmp ?? 100) * dt;
+
+    }
+    
 }
 

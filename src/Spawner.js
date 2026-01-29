@@ -11,12 +11,13 @@ export default class Spawner {
 
     this.powerUp = new powerUp();
     this.powerUpSpawns = false;
-    this.powerUpAssigned = false;
+    this.nextPowerUpScore = 15;
+    this.nextMiniBoss = 10;
     
     this.pending = [];
     this.patternBook = Object.values(funcs);
     console.log(funcs);
-console.log(this.patternBook);
+    console.log(this.patternBook);
 //console.log(typeof this.patternBook[0]); // should print "function"
   }
 
@@ -35,19 +36,30 @@ console.log(this.patternBook);
   }
   this.spawnPending(dt);
   
-  if(this.game.score > 0 && this.game.score % 10){
-    
+  if(this.game.score >= this.nextPowerUpScore && !this.powerUpSpawns){
+    this.powerUpSpawns = true;
+    this.nextPowerUpScore += 15;
   }
 
   }
 
   startPattern(){
     this.patternTimer = 0;
-    const pick = funcs.spawnHeli;
-    // this.patternBook[Math.floor(Math.random() * this.patternBook.length)]
-    this.currPattern = pick;
+    let pick = 0;
+    if(this.game.score > 0 && this.game.score >= this.nextMiniBoss){
+      pick = funcs.miniBoss;
+      this.currPattern = pick;
+      this.patternDur = pick(this);
 
-    this.patternDur= pick(this);
+      this.nextMiniBoss += 15;
+    }else{
+      const availablePatterns = this.patternBook.filter(
+      p => p !== funcs.miniBoss
+    );
+      pick = availablePatterns[Math.floor(Math.random() * availablePatterns.length)];
+      this.currPattern = pick;
+      this.patternDur = pick(this);
+    }
 
   } 
 

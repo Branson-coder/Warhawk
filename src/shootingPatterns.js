@@ -4,7 +4,8 @@ const bullet1 = new Image();
 bullet1.src = './src/engine/assets/bullet1.png';
 const bullet2 = new Image();
 bullet2.src = 'src/engine/assets/bullet2.png';
-
+const bullet3 = new Image();
+bullet3.src = 'src/engine/assets/bullet3.png';
 export function spawnBullet(game, enemy, dx, dy){
      if (!game || !game.player) return;
     const ex = enemy.x + enemy.w/2;
@@ -21,6 +22,8 @@ export function spawnBullet(game, enemy, dx, dy){
     let img = 0;    
     if(enemy.rotationMode == "diagonal"){
       img = bullet2;
+    }else if(enemy.class == "miniBoss"){
+      img = bullet3;
     }else{
       img = bullet1;
     }
@@ -103,4 +106,23 @@ export function burst(game, enemy){
   }
 
   enemy.burstTimer = 0;
+}
+
+export function missile(game, enemy){
+  const px = game.player.x + game.player.w/2;
+  const py = game.player.y + game.player.y/2;
+
+  let dx = px - (enemy.x + enemy.w/2);
+  let dy = py - (enemy.y + enemy.h/2);
+
+  const len = hypot(dy, dx) || 1;
+
+  dx /= len;
+  dy /= len;
+
+  const dur = 3;
+  const speed = 200;
+  
+  
+
 }

@@ -1,5 +1,6 @@
 // src/Enemy.js
 import Collider from "./Collider.js";
+import powerUp from "./powerups.js";
 import EnemyBullet from "./EnemyBullet.js";
 import {spawnBullet} from "./shootingPatterns.js";
 
@@ -13,14 +14,14 @@ export default class Enemy {
     this.colour = opts.colour ?? "blue";
     this.speed = opts.speed ?? 95; this.vx = 0; this.vy = this.speed, 
     this.despawn = false; this.dropPowerup = false;
-    this.type = 'enemy';
-    this.timeAlive = 0;
+    this.type = 'enemy'; this.class = opts.class ?? "normal";
+    this.timeAlive = 0; 
     this.game = opts.game ?? null;
     this.pattern = opts.pattern ?? null;
     this.fireTimer = opts.fireTimer ?? 3; this.tempTimer = this.fireTimer; 
     this.hasShot = false;
     this.collider = Collider;
-    this.shotsPattern = opts.shotsPattern ?? 1;
+    this.shotsPattern = opts.shotsPattern ?? 1; 
     this.colourTimer = 0; this.hitTimer = 0; this.hitDuration = 0.1;
     this.original = this.colour;
     this.spritesheet = opts.spritesheet ?? null;
@@ -36,11 +37,15 @@ export default class Enemy {
     this.burstInterval = 0.1; this.burstSpread = opts.Spread ?? 0;
     this.burstTimer = 0; 
 
+    this.missileLife = 0;
+
     this.preX = this.x;
     this.preY = this.y;
     this.spriteDir = "center"; this.phase = opts.phase ?? "enter";
+    this.miniBoss2Shift = 0;
 
     this.rotationMode = opts.rotationMode ?? "curved";
+    this.lockedTimer = 0.4;
     this.shootingPattern = opts.shootingPattern ?? null;
     this.canShoot = opts.canShoot ?? 1.0;
 
@@ -73,11 +78,16 @@ export default class Enemy {
     this._arcSpeed = opts.arcSpeed ?? 1.2;
     this.timeParam = 0;
     this._followSpeed = opts.followSpeed ?? 120;
+    this._followDist = opts.followDist ?? 200;
 
   }
 
   update(dt, game) {
     this.timeAlive += dt;
+
+   if(this.hitTimer > 0){
+    this.hitTimer -= dt;
+   }
     
    if(Array.isArray(this.frames)){
 
@@ -173,14 +183,11 @@ export default class Enemy {
 
 
     }
-
-    if (this.y > (game.h) || this.y < -60 || this.x > game.w + 60 || this.x < -60) this.despawn = true;
+    if(this.rotationMode != "miniBoss2"){
+      if (this.y > (game.h) || this.y < -60 || this.x > game.w + 60 || this.x < -60) this.despawn = true;
+    }
+    
   }
-
-  enemyShoot(game) {
-
-  }
-
 
  draw(ctx) {
        ctx.save();
@@ -218,8 +225,14 @@ export default class Enemy {
     
     ctx.rotate(this.angle || 0);
 
+    if(this.hitTimer > 0 ){
+      ctx.filter = "brightness(2)";
+    }
+
     // draw image centered
     ctx.drawImage(img, -this.w / 2, -this.h / 2, this.w, this.h);
+
+    ctx.filter = "none";
 
     ctx.restore();
 }
@@ -243,9 +256,8 @@ export default class Enemy {
       if(this.hp <= 0){
         this.death(game);
       }
-
-      this.colourTimer = 0.1;
-      this.colour = "white";
+      
+      this.hitTimer = this.hitDuration;
 
     }
   }
@@ -256,7 +268,8 @@ export default class Enemy {
     game.score += 1;
 
     if(this.dropPowerup){
-      
+      game.entities.add( new powerUp(this.x + this.w/2, this.y + this.h/2));
+      console.log("spawning the thing");
     }
 
   }

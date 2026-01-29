@@ -2,6 +2,7 @@ import Input from "./input.js";
 import EntityManager from "./EntityManager.js";
 import spawner from "../Spawner.js";
 import Player  from "./player.js";
+import powerUp from "../powerups.js"
 import Background from "../Background.js";
 
 export default class Game{
@@ -18,14 +19,23 @@ export default class Game{
 
         this.entities = new EntityManager();
         this.spawner = new spawner(this);
-        
         this.player = new Player(this.w, this.h, this);
         this.entities.add(this.player);
         this.background = new Background();
+
+        this.bgm = new Audio("./src/engine/assets/bgm.mp3");
+        this.bgm.loop = true;
+        this.music = false;
     }
 
 
     start(){
+
+        if(!this.music){
+            this.bgm.play().catch(() => {});
+            this.music = true;
+        }
+
         this.running = true;
         requestAnimationFrame(this.loop.bind(this));
     }
