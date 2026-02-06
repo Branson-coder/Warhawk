@@ -11,11 +11,14 @@ export default class Spawner {
 
     this.powerUp = new powerUp();
     this.powerUpSpawns = false;
-    this.nextPowerUpScore = 15;
+    this.nextPowerUpScore = 5;
     this.nextMiniBoss = 10;
+   
     
     this.pending = [];
     this.patternBook = Object.values(funcs);
+    this.activeEnemies = 0;
+
     console.log(funcs);
     console.log(this.patternBook);
 //console.log(typeof this.patternBook[0]); // should print "function"
@@ -31,7 +34,7 @@ export default class Spawner {
     this.patternTimer = 0;
    }
    
-   if(this.patternTimer > this.patternDur){
+   if(this.activeEnemies == 0 && this.pending.length == 0){
     this.currPattern = null;
   }
   this.spawnPending(dt);
@@ -68,8 +71,13 @@ export default class Spawner {
       this.pending[i].delay -= dt;
       if(this.pending[i].delay <= 0){
         this.game.entities.add(this.pending[i].enemy);
-        this.pending.splice(i, 1);
-          console.log("yo i spawned");
+        this.activeEnemies++;
+        const enemy = this.pending[i].enemy;
+        this.pending.splice(i, 1);  
+        
+        enemy.onDeath = () => {
+          this.activeEnemies--;
+        }
       }
     }
   }

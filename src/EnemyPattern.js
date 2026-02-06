@@ -1,3 +1,8 @@
+
+export function straight(en, dt, game){
+  en.y += en.vy * en.speed * dt;
+}
+
 export function diagonal(en, dt, game) {
   en.x += en.diag.vx * dt;
   en.y += en.diag.vy * dt;
@@ -28,6 +33,30 @@ export function curved(en, dt, game){
     u * u * c.start.y +
     2 * u * t * c.control.y +
     t * t * c.end.y;  
+}
+
+export function roller(en, dt, game){
+  const c = en.curve;
+  if (!c) return;
+
+  c.t += c.speed * dt;
+  if(c.t > 1) c.t = 1;
+
+  const t = c.t;
+  const u = 1 - t;
+
+  // Cubic Bezier formula
+  en.x =
+    u*u*u * c.start.x +
+    3*u*u*t * c.control1.x +
+    3*u*t*t * c.control2.x +
+    t*t*t * c.end.x;
+
+  en.y =
+    u*u*u * c.start.y +
+    3*u*u*t * c.control1.y +
+    3*u*t*t * c.control2.y +
+    t*t*t * c.end.y;
 }
 
 export function miniBoss(en, dt, game) {
@@ -130,7 +159,7 @@ export function followPlayer(en, dt, game) {
       const pxv = -dy;
       const pyv = dx;
 
-      const strafe = Math.sin(en.timeAlive * 7) * 100;
+      const strafe = Math.sin(en.timeAlive * 2.5) * 100;
 
       en.x += pxv * strafe * dt;
       en.y += pyv * strafe * dt;

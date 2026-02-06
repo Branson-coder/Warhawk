@@ -3,6 +3,7 @@ import Collider from "./Collider.js";
 import powerUp from "./powerups.js";
 import EnemyBullet from "./EnemyBullet.js";
 import {spawnBullet} from "./shootingPatterns.js";
+import { Explosion } from "./Explosion.js";
 
 export default class Enemy {
   constructor(opts = {}) {
@@ -13,7 +14,7 @@ export default class Enemy {
     this.hp = opts.hp ?? 110;
     this.colour = opts.colour ?? "blue";
     this.speed = opts.speed ?? 95; this.vx = 0; this.vy = this.speed, 
-    this.despawn = false; this.dropPowerup = false;
+    this.despawn = false; this.onDeath = null; this.dropPowerup = false; 
     this.type = 'enemy'; this.class = opts.class ?? "normal";
     this.timeAlive = 0; 
     this.game = opts.game ?? null;
@@ -22,6 +23,7 @@ export default class Enemy {
     this.hasShot = false;
     this.collider = Collider;
     this.shotsPattern = opts.shotsPattern ?? 1; 
+    this.shotType = opts.shotType ?? "multiple";
     this.colourTimer = 0; this.hitTimer = 0; this.hitDuration = 0.1;
     this.original = this.colour;
     this.spritesheet = opts.spritesheet ?? null;
@@ -128,6 +130,21 @@ export default class Enemy {
     diff = Math.max(-MAX_BANK, Math.min(MAX_BANK, diff));
 
     this.bankAngle += (diff - this.bankAngle) * FLATNESS;
+}else if(this.rotationMode == "side"){
+  const dy = this.y - this.preY;
+  const BANK_ANGLE = Math.PI/16;
+  const SMOOTH = 0.02;
+  
+  const flip = (this.directionAngle === Math.PI/2) ? -1 : 1;
+
+  let Ang = 0;
+  if (dy > 10.4) Ang = -BANK_ANGLE;
+  
+    
+
+  this.bankAngle += (flip * Ang - this.bankAngle)*SMOOTH; 
+
+  this.prey = this.y;
 }
   
    this.angle = this.directionAngle  + this.bankAngle;
@@ -152,7 +169,7 @@ export default class Enemy {
 
     }
   
-    if(this.rotationMode == "diagonal"){
+    if(this.rotationMode == "diagonal" || this.rotationMode == "side"){
       if(!this.hasShot && this.timeAlive >= 1.2){
         if(this.shootingPattern){
           this.shootingPattern(game, this);
@@ -184,7 +201,7 @@ export default class Enemy {
 
     }
     if(this.rotationMode != "miniBoss2"){
-      if (this.y > (game.h) || this.y < -60 || this.x > game.w + 60 || this.x < -60) this.despawn = true;
+      if (this.y > (game.h + 15) || this.y < -60 || this.x > game.w + 60 || this.x < -60) this.death(game);
     }
     
   }
@@ -229,7 +246,6 @@ export default class Enemy {
       ctx.filter = "brightness(2)";
     }
 
-    // draw image centered
     ctx.drawImage(img, -this.w / 2, -this.h / 2, this.w, this.h);
 
     ctx.filter = "none";
@@ -254,6 +270,7 @@ export default class Enemy {
     if(other.type == 'player' || other.type == 'playerBullet'){
       this.hp -= 10;
       if(this.hp <= 0){
+        game.score += 1;
         this.death(game);
       }
       
@@ -265,12 +282,16 @@ export default class Enemy {
   
   death(game){
     this.despawn = true;
-    game.score += 1;
+    if(this.onDeath) this.onDeath();
+
+    game.entities.add(new Explosion(this.x, this.y, game.explosionImg));
 
     if(this.dropPowerup){
       game.entities.add( new powerUp(this.x + this.w/2, this.y + this.h/2));
+
       console.log("spawning the thing");
     }
+
 
   }
 }

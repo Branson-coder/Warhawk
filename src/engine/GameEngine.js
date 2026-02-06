@@ -4,6 +4,7 @@ import spawner from "../Spawner.js";
 import Player  from "./player.js";
 import powerUp from "../powerups.js"
 import Background from "../Background.js";
+import { Explosion } from "../Explosion.js";
 
 export default class Game{
     constructor(canvas, ctx){
@@ -22,6 +23,13 @@ export default class Game{
         this.player = new Player(this.w, this.h, this);
         this.entities.add(this.player);
         this.background = new Background();
+
+        this.explosionImg = [];
+        for(let i = 1; i <= 16; i++){
+            const temp = new Image();
+            temp.src = `./src/engine/assets/explosions/${i}.png`;
+            this.explosionImg.push(temp);
+        }
 
         this.bgm = new Audio("./src/engine/assets/bgm.mp3");
         this.bgm.loop = true;
