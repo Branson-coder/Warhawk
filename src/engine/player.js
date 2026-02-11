@@ -2,7 +2,7 @@ import Bullet from "../bullet.js"
 import Collider from "../Collider.js";
 import powerUp from "../powerups.js";
 import SmokeParticle from "../smoke.js";
-import { missileShoot } from "./missileShoot.js";
+import { missileShoot } from "../missileShoot.js";
 
 export default class Player {
     constructor(GAME_W, GAME_H, game) {
@@ -89,24 +89,6 @@ export default class Player {
             this.missileTimer = this.missileCoolDown;
         }
 
-        this.smokeTimer = (this.smokeTimer || 0) + dt;
-
-        if (this.smokeTimer > 0.03) {
-        this.smokeTimer = 0;
-
-        const leftWing = {
-            x: this.x + 5,
-            y: this.y + 35
-        };
-
-        const rightWing = {
-            x: this.x + this.width - 5,
-            y: this.y + 35
-        };
-
-        this.game.entities.add(new SmokeParticle(leftWing.x, leftWing.y));
-        this.game.entities.add(new SmokeParticle(rightWing.x, rightWing.y));
-}
 }
 
     shoot(game){

@@ -7,6 +7,6 @@ export class missilePower extends powerUp{
     }
 
     apply(player){
-        player.missileCount += 3;
+        player.missileCount += 100;
     }
 }

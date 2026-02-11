@@ -13,7 +13,7 @@ export default class Enemy {
     this.y = opts.y ?? -30;
     this.w = opts.w ?? 70;
     this.h = opts.h ?? 85;
-    this.hp = opts.hp ?? 110;
+    this.hp = opts.hp ?? 105;
     this.colour = opts.colour ?? "blue";
     this.speed = opts.speed ?? 95; this.vx = 0; this.vy = this.speed, 
     this.despawn = false; this.onDeath = null; this.dropPowerUp = "nothing"; 
@@ -204,7 +204,7 @@ export default class Enemy {
 
     }
     if(this.rotationMode != "miniBoss2" && this.class != "miniBoss"){
-      if (this.y > (game.h + 15) || this.y < -60 || this.x > game.w + 60 || this.x < -60) this.death(game);
+      if (this.y > (game.h + this.h) || this.y < -60 || this.x > game.w + 60 || this.x < -60) this.death(game);
     }
     
   }
@@ -271,18 +271,35 @@ export default class Enemy {
 
   onCollision(other, game){
     if(other.type == 'player' || other.type == 'playerBullet'){
-      this.hp -= 8;
-      if(this.hp <= 0){
-        if(this.class == "miniBoss"){
-          console.log("miniBoss dead");
-        }
+      this.hp -= 8;    
+      this.hitTimer = this.hitDuration;
+        if(this.hp <= 0){
         game.score += 1;
         this.death(game);
-      } 
-      
+        }     
+
+    }else if(other.type == 'playerMissile'){
+      this.hp -= 70;
+      game.entities.add(new Explosion(this.x + this.w/2 - 200, this.y + this.h/2 - 200, game.explosionImg, 400, 400, 'missile'));
       this.hitTimer = this.hitDuration;
+        if(this.hp <= 0){
+        game.score += 1;
+        this.death(game);
+        }     
 
     }
+
+    if(other.type == 'explosion'){
+      if(other.t == 'missile'){
+        this.hp -= 200;
+        this.hitTimer = this.hitDuration;
+        if(this.hp <= 0){
+        game.score += 1;
+        this.death(game);
+      }     
+      }
+    }
+    
   }
 
   
@@ -297,7 +314,7 @@ export default class Enemy {
       //console.log("Calling onDeath callback");
       this.onDeath();
     }
-    game.entities.add(new Explosion(this.x, this.y, game.explosionImg));
+    game.entities.add(new Explosion(this.x, this.y, game.explosionImg, this.w, this.h, 'self'));
 
       
 

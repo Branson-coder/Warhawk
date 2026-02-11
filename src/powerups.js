@@ -12,7 +12,7 @@ export default class powerUp{
     
     update(dt){
         this.time += dt;
-        this.y = this.baseY + Math.sin(this.time * 4) * 5;
+        this.y = this.baseY + Math.sin(this.time * 4) * 7;
     }
     get left()   { return this.x; }
     get right()  { return this.x + this.w; }

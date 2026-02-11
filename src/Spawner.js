@@ -85,7 +85,8 @@ export default class Spawner {
       const availablePatterns = this.patternBook.filter(
       p => p !== funcs.miniBoss
     );
-      pick = availablePatterns[Math.floor(Math.random() * availablePatterns.length)];
+      pick = funcs.spawnStraight; 
+      //availablePatterns[Math.floor(Math.random() * availablePatterns.length)];
       this.currPattern = pick;
       this.patternDur = pick(this);
     }

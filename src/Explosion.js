@@ -1,12 +1,16 @@
+import Collider from "./Collider.js";
 export class Explosion{
-    constructor(x, y, img){
+    constructor(x, y, img, w, h, t){
+        this.type = 'explosion'; this.t = t;
         this.x = x; 
         this.y = y;
+        this.w = w; this.h = h;
         this.frame = 0;
         this.maxFrame = 16;
         this.timer = 0;
         this.inter = 0.01;
         this.images = img;
+        this.collider = Collider;
         this.despawn = false;
     };
 
@@ -22,9 +26,21 @@ export class Explosion{
             }
         }
     }
+     get left() {
+    return this.x;
+  }
+  get right() {
+    return this.x + this.w;
+  }
+  get top() {
+    return this.y;
+  }
+  get bottom() {
+    return this.y + this.h;
+  }
 
     draw(ctx){  
-        ctx.drawImage(this.images[this.frame], this.x, this.y);
+        ctx.drawImage(this.images[this.frame], this.x, this.y, this.w, this.h);
 
     }
 
