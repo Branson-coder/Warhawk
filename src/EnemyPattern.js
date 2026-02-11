@@ -81,15 +81,13 @@ export function miniBoss2(en, dt, game){
   if((en.y >= game.h + en.h|| en.y <= -en.h - 50)){
     en.phase = "locked";
     en.speed *= -1;
-    en.miniBoss2Shift = Math.random() * 80 - 40;
-   
+    en.miniBoss2 = Math.random() * game.w * 0.5;
     en.lockedTimer = 0.4;
     en.directionAngle += Math.PI;
   }
 
   if(en.phase == "locked" ){
-    const change = Math.random() * game.w * 0.5;
-     en.x = change;
+    en.x = en.miniBoss2;
     en.lockedTimer -= dt;
 
     if(en.lockedTimer <= 0){

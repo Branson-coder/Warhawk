@@ -1,5 +1,8 @@
 import Bullet from "../bullet.js"
 import Collider from "../Collider.js";
+import powerUp from "../powerups.js";
+import SmokeParticle from "../smoke.js";
+import { missileShoot } from "./missileShoot.js";
 
 export default class Player {
     constructor(GAME_W, GAME_H, game) {
@@ -11,7 +14,9 @@ export default class Player {
         this.width = 60;
         this.height = 60;
         this.x = GAME_W/2 - this.width/2; this.y= GAME_H/2 - this.height - 20;
+        this.hp = 50; this.maxHp = 50;
         this.speed = 200;
+        this.smokeTimer = 0;
 
         this.fireRate = 0.12; this.fireTime = 0; 
 
@@ -21,14 +26,20 @@ export default class Player {
 
         this.depsawn = false;
         this.collider = Collider;
-        this.hp = 50;
+
+        this.powerUp = powerUp;
         this.powerlvl = 0;
-        this.shots = [
+        this.currShotType = "straight";
+        this.straightShots = [
             [-3],
             [-8, 5],
             [-15, -3, 11],
             [-21, -15, -3, 11, 17]
         ];
+
+        this.missileCount = 0;
+        this.missileCoolDown = 0.6;
+        this.missileTimer = 0;
 
 
         this.center = new Image();
@@ -70,10 +81,36 @@ export default class Player {
             this.fireTime = this.fireRate;
             this.shoot(game);
         }
-    }
+
+        this.missileTimer -= dt;
+        if(this.missileCount > 0 && this.missileTimer <=0 && (inp.isDown("m") || inp.isDown("g"))){
+            this.missileCount--;
+            game.entities.add(new missileShoot(this.x + this.width/2 - 8, this.y - 10));
+            this.missileTimer = this.missileCoolDown;
+        }
+
+        this.smokeTimer = (this.smokeTimer || 0) + dt;
+
+        if (this.smokeTimer > 0.03) {
+        this.smokeTimer = 0;
+
+        const leftWing = {
+            x: this.x + 5,
+            y: this.y + 35
+        };
+
+        const rightWing = {
+            x: this.x + this.width - 5,
+            y: this.y + 35
+        };
+
+        this.game.entities.add(new SmokeParticle(leftWing.x, leftWing.y));
+        this.game.entities.add(new SmokeParticle(rightWing.x, rightWing.y));
+}
+}
 
     shoot(game){
-        const exits = this.shots[this.powerlvl];
+        const exits = this.straightShots[this.powerlvl];
         const cx = this.x + this.width/2;
         const cy = this.y;
 
@@ -125,17 +162,10 @@ export default class Player {
     onCollision(other, game){
         if(other.type == 'enemyBullet'){
             other.despawn = true;
-            this.hp -= 15;
-            if(this.hp <= 0) this.despawn = true;
+            this.hp -= 0;
+            
         }
-
-        if(other.type == 'powerUp'){
-            other.despawn = true
-              this.powerlvl = Math.min(
-              this.powerlvl + 1,
-              this.shots.length - 1
-          );
-        }
+        if(this.hp <= 0) this.despawn = true;
     }
     
 }   

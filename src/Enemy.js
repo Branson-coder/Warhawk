@@ -1,8 +1,10 @@
 // src/Enemy.js
 import Collider from "./Collider.js";
-import powerUp from "./powerups.js";
+import { straightPower } from "./straightPower.js";
+import { health } from "./health.js";
+import { missilePower } from "./missilePower.js";
 import EnemyBullet from "./EnemyBullet.js";
-import {spawnBullet} from "./shootingPatterns.js";
+import {missile, spawnBullet} from "./shootingPatterns.js";
 import { Explosion } from "./Explosion.js";
 
 export default class Enemy {
@@ -14,9 +16,9 @@ export default class Enemy {
     this.hp = opts.hp ?? 110;
     this.colour = opts.colour ?? "blue";
     this.speed = opts.speed ?? 95; this.vx = 0; this.vy = this.speed, 
-    this.despawn = false; this.onDeath = null; this.dropPowerup = false; 
+    this.despawn = false; this.onDeath = null; this.dropPowerUp = "nothing"; 
     this.type = 'enemy'; this.class = opts.class ?? "normal";
-    this.timeAlive = 0; 
+    this.timeAlive = 0; this.isDead = false;
     this.game = opts.game ?? null;
     this.pattern = opts.pattern ?? null;
     this.fireTimer = opts.fireTimer ?? 3; this.tempTimer = this.fireTimer; 
@@ -46,7 +48,7 @@ export default class Enemy {
     this.spriteDir = "center"; this.phase = opts.phase ?? "enter";
     this.miniBoss2Shift = 0;
 
-    this.rotationMode = opts.rotationMode ?? "curved";
+    this.rotationMode = opts.rotationMode ?? "curved";  
     this.lockedTimer = 0.4;
     this.shootingPattern = opts.shootingPattern ?? null;
     this.canShoot = opts.canShoot ?? 1.0;
@@ -54,7 +56,10 @@ export default class Enemy {
     this.directionAngle = opts.directionAngle ?? Math.PI;
     this.bankAngle = 0;
     this.angle = opts.angle ?? 0;
-    // pattern tunables
+    // pattern tunables/
+    this.curveDelay = opts.curveTimer ?? 100;
+    this.curveTimer = 0;
+    this.curveSpeed = 1.2;
     this._sineFreq = opts.sineFreq ?? 3.0;
     this._sineAmp = opts.sineAmp ?? 60;
     this._zigFreq = opts.zigFreq ?? 1.5;
@@ -184,8 +189,6 @@ export default class Enemy {
       this.fireTimer = this.tempTimer;
       if(this.shootingPattern){
         this.shootingPattern(game, this);
-      }else{
-        console.log("shit aint working");
       }
 
     }
@@ -200,7 +203,7 @@ export default class Enemy {
 
 
     }
-    if(this.rotationMode != "miniBoss2"){
+    if(this.rotationMode != "miniBoss2" && this.class != "miniBoss"){
       if (this.y > (game.h + 15) || this.y < -60 || this.x > game.w + 60 || this.x < -60) this.death(game);
     }
     
@@ -268,11 +271,14 @@ export default class Enemy {
 
   onCollision(other, game){
     if(other.type == 'player' || other.type == 'playerBullet'){
-      this.hp -= 10;
+      this.hp -= 8;
       if(this.hp <= 0){
+        if(this.class == "miniBoss"){
+          console.log("miniBoss dead");
+        }
         game.score += 1;
         this.death(game);
-      }
+      } 
       
       this.hitTimer = this.hitDuration;
 
@@ -281,16 +287,30 @@ export default class Enemy {
 
   
   death(game){
-    this.despawn = true;
-    if(this.onDeath) this.onDeath();
+    if(this.isDead){
+      return;
+    }
 
+    this.isDead = true;
+    this.despawn = true;
+    if(this.onDeath) {
+      //console.log("Calling onDeath callback");
+      this.onDeath();
+    }
     game.entities.add(new Explosion(this.x, this.y, game.explosionImg));
 
-    if(this.dropPowerup){
-      game.entities.add( new powerUp(this.x + this.w/2, this.y + this.h/2));
+      
 
-      console.log("spawning the thing");
-    }
+      if(this.dropPowerUp == 'straightShot'){
+           game.entities.add( new straightPower(this.x + this.w/2, this.y + this.h/2));
+           console.log("Spawning powerup");
+      }else if(this.dropPowerUp == 'health'){
+           game.entities.add( new health(this.x + this.w/2, this.y + this.h/2));
+           console.log("Spawning powerup");
+      }else if(this.dropPowerUp == 'missile'){
+          game.entities.add(  new missilePower(this.x + this.w/2, this.y + this.h/2));
+      }
+   
 
 
   }

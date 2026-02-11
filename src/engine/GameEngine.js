@@ -4,6 +4,7 @@ import spawner from "../Spawner.js";
 import Player  from "./player.js";
 import powerUp from "../powerups.js"
 import Background from "../Background.js";
+
 import { Explosion } from "../Explosion.js";
 
 export default class Game{
@@ -69,15 +70,53 @@ export default class Game{
         this.entities.cleanup();
        
     }
+
+    drawHUD(ctx) {
+    const padding = 10;
+    ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+    ctx.fillRect(0, 0, this.w, 48);
+
+    ctx.fillStyle = "white";
+    ctx.font = "14px monospace";
+    ctx.textAlign = "right";
+    ctx.fillText(`Score: ${this.score}`, this.w - padding, 18);
+
+    const barX = padding;
+    const barY = 14;
+    const barW = 160;
+    const barH = 16;
+
+    const hpRatio = this.player.hp / this.player.maxHp;
+    
+    ctx.fillStyle = "#333";
+    ctx.fillRect(barX, barY, barW, barH);
+
+    // bar fill
+    ctx.fillStyle = hpRatio > 0.3 ? "#4cff4c" : "#ff4444";
+    ctx.fillRect(barX, barY, barW * hpRatio, barH);
+
+    ctx.strokeStyle = "white";
+    ctx.strokeRect(barX, barY, barW, barH);
+
+    // HP text
+    ctx.textAlign = "left";
+    ctx.fillStyle = "white";
+    ctx.font = "12px monospace";
+    ctx.fillText(
+        `${hpRatio * 100}%`,
+        barX + barW + 8,
+        barY + 12
+    );
+}
+
     
     draw(ctx){
         ctx.clearRect(0,0, this.w, this.h);
         this.background.draw(ctx); 
         this.entities.draw(ctx);
 
-        ctx.fillStyle = 'white';
-        ctx.font = '14px monospace';
-        ctx.fillText('Score: ' + (this.score), 10, 18);
+       // ===== HUD =====
+        this.drawHUD(ctx);
 
         
     }
