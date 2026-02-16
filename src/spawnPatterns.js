@@ -1,24 +1,33 @@
 import * as Patterns from "./EnemyPattern.js";
 import Enemy from "./Enemy.js";
-import {spray} from "./shootingPatterns.js";
+import {missile, spray} from "./shootingPatterns.js";
 import { basic } from "./shootingPatterns.js";
 import { burst } from "./shootingPatterns.js";
+import EnemyBullet from "./EnemyBullet.js";
 
 
 export function spawnStraight(spawner){
   const img = new Image();
-  img.src = "./src/engine/assets/sineCurve.png";
+  const sprites = [
+    "./src/engine/assets/sineCurve.png",
+    "./src/engine/assets/straight.png",
+    "./src/engine/assets/horizontal.png"
+  ]
+  const randomIdx = Math.floor(Math.random() * sprites.length);
+  img.src = sprites[randomIdx];
 
   const frameS ={
     center:img
   };
 
-  const count = [4, 5, 6, 6]
+  const count = [3, 4, 4, 4]
   const fromUp = Math.random() < 0.5;
   const starts = [
     {sx: 100, sy: fromUp ? spawner.game.h + - 50: -50},
     {sx:  300, sy:fromUp ? spawner.game.h + - 50: -50}
   ]
+
+  const bursts = [1, 2, 2, 2];
 
   const colDelay = 4.0;
 
@@ -27,7 +36,8 @@ export function spawnStraight(spawner){
     for(let j = 0; j < count[spawner.diffIdx]; j++){
       const enemy = new Enemy({
         x: s.sx, y:s.sy, w:60, h:60, speed: 130,
-        game:spawner.game, frames: frameS, shootingPattern:basic,
+        game:spawner.game, frames: frameS, shootingPattern:burst,
+        burstRounds: bursts[spawner.diffIdx],
         pattern: Patterns.straight, fireTimer: 3.0,
         rotationMode: "straight",
         directionAngle: fromUp ? Math.PI : 0
@@ -36,8 +46,13 @@ export function spawnStraight(spawner){
       
 
        if (spawner.pickUps.length > 0){
-    enemy.dropPowerUp = spawner.pickUps.shift();
-  }
+        if(spawner.pickUps[0] != 'missile'){
+          enemy.dropPowerUp = spawner.pickUps[0];
+        }else{
+          enemy.dropPowerUp = spawner.pickUps.shift();
+        }
+        
+      }
 
       enemy.vy = fromUp ? -1 : 1;
       spawner.pending.push({
@@ -52,15 +67,84 @@ export function spawnStraight(spawner){
  
 }
 
+export function spawnHori(spawner){
+  const img = new Image();
+  const sprites = [
+    "./src/engine/assets/sineCurve.png",
+    "./src/engine/assets/straight.png",
+    "./src/engine/assets/horizontal.png"
+  ]
+  const randomIdx = Math.floor(Math.random() * sprites.length);
+  img.src = sprites[randomIdx];
+
+  const frames = {
+    center:img
+  }
+
+  const sets =[
+    [0],
+    [-40, 40],
+    [-70, 70]
+  ]
+
+
+  const fromLeft = Math.random() < 0.5;
+  const goingUp = Math.random() < 0.5;
+  const sx= fromLeft ? -50 :spawner.game.w + 50;
+  const sy = Math.random() * (spawner.game.h * 0.5 - spawner.game.h * 0.25) + spawner.game.h * 0.25;
+
+  let direction;
+  const angle =  fromLeft ? goingUp ? -Math.PI/8 : Math.PI/4 : goingUp ? -(3 * Math.PI)/4 : (3 * Math.PI)/4;
+  if (fromLeft && goingUp) {
+        direction = -(Math.PI / 2);     
+      }
+      else if (fromLeft && !goingUp) {
+        direction = -(Math.PI / 4) - 0.5;      
+      }
+      else if (!fromLeft && goingUp) {
+        direction = (3 *Math.PI) / 4;
+      }
+      else {
+        direction = -(3*Math.PI) / 4 + Math.PI + 0.5;
+  }
+  
+  for(let j = 0; j < sets.length; j++){
+    const y = sets[j];
+    for(let i = 0; i < y.length; i++){
+    const enemy = new Enemy({
+      x:sx, y:sy + y[i], w:60, h:60, game:spawner.game, frames: frames,
+      speed: 120, shootingPattern:basic, fireTimer: 2.5, 
+      pattern: Patterns.diagonal, rotationMode:"diagonal",
+      directionAngle: direction
+    })
+
+    enemy.diag ={
+            vx: Math.cos(angle) * enemy.speed,
+            vy: Math.sin(angle) * enemy.speed
+        };
+    spawner.pending.push({
+      enemy,
+      delay: j * 1.0 
+    })
+    }
+  }
+  
+}
 
 export function spawnDiagonal(spawner){
-    const straightImg = new Image();
-    straightImg.src = "./src/engine/assets/straight.png";
+  const img = new Image();
+  const sprites = [
+    "./src/engine/assets/sineCurve.png",
+    "./src/engine/assets/straight.png",
+    "./src/engine/assets/horizontal.png"
+  ]
+  const randomIdx = Math.floor(Math.random() * sprites.length);
+  img.src = sprites[randomIdx];
         
     const frame = {
-      center: straightImg
+      center: img
     }
-   const count = [4, 6, 8, 9, 10];
+   const count = [3, 4, 4, 5];
 
       const fromLeft = Math.random() < 0.5;
       const goingUp = Math.random() < 0.5;
@@ -110,7 +194,7 @@ export function spawnDiagonal(spawner){
           const enemy = new Enemy({
             x:side.sx, y:side.sy, w:60, h:60, game:spawner.game, frames:frame,
             speed:110,
-            shootingPattern:basic, canShoot: Math.random() < 0.25, shotType: "once",
+            shootingPattern:basic,  shotType: "once",
             pattern:Patterns.diagonal,
             rotationMode: "diagonal",
             directionAngle: side.dir
@@ -121,9 +205,15 @@ export function spawnDiagonal(spawner){
             vy: Math.sin(side.angle) * enemy.speed
           };
           
-           if (spawner.pickUps.length > 0){
-            enemy.dropPowerUp = spawner.pickUps.shift();
-          }
+            if (spawner.pickUps.length > 0){
+        if(spawner.pickUps[0] != 'missile'){
+          enemy.dropPowerUp = spawner.pickUps[0];
+        }else{
+          enemy.dropPowerUp = spawner.pickUps.shift();
+        }
+        
+      }
+
           spawner.pending.push({
             enemy,
             delay: i * 1.0
@@ -142,8 +232,11 @@ export function spawnHeli(spawner){
                 frameImg1.push(img);
             }
             
+            const timerFire = [2.0, 1.0, 1.0, 1.0];
+            const speed = [120, 130, 135, 135];
             
-            let startX1 = 0; let flip = 1, temp;
+            
+            let startX1 = 0; let flip = 1;
               for(let i = 0; i < 3; i++){
 
                 if(flip == 1){
@@ -153,16 +246,13 @@ export function spawnHeli(spawner){
                 }
                 const enemy = new Enemy({
                 x:startX1, y:-50, game: spawner.game, frames: frameImg1, pattern:Patterns.followPlayer, frameCount:5,
-                fireTimer: 2.0,
+                fireTimer: timerFire[spawner.diffIdx],
                 _followDist: Math.random() * 600 + 200,
+                _followSpeed: speed[spawner.diffIdx],
                 zigAmp: Math.random() * 60 + 60,
                 shootingPattern: spray,
-                directionAngle: 0, angle: 0 
+                directionAngle: 0
               })
-
-               if (spawner.pickUps.length > 0){
-                enemy.dropPowerUp = spawner.pickUps.shift();
-              }
 
                 spawner.pending.push({
                   enemy,
@@ -178,12 +268,17 @@ export function spawnHeli(spawner){
 }
 
 export function spawnCurve(spawner){
- const img_cent = new Image();
-
-        img_cent.src = "src/engine/assets/airplane2_center.png";
-        const framesImg3 = {
-          center:img_cent,
-        };
+  const img = new Image();
+  const sprites = [
+    "./src/engine/assets/airplane2_center.png",
+    "./src/engine/assets/airplane5.png",
+    "./src/engine/assets/airplane4.png"
+  ]
+  const randomIdx = Math.floor(Math.random() * sprites.length);
+  img.src = sprites[randomIdx];
+  const frames = {
+    center:img
+  }
 
         const flipX  = Math.random() < 0.5;
         const flipY = Math.random() < 0.5;
@@ -191,7 +286,7 @@ export function spawnCurve(spawner){
         for(let i = 0; i < 5; i++){
            const enemy = new Enemy({
           x:sx, y:-50, w:60, h:60,
-          game:spawner.game, fireTimer: 2.0, frames:framesImg3, pattern:Patterns.curved,
+          game:spawner.game, fireTimer: 2.0, frames:frames, pattern:Patterns.curved,
           shootingPattern: burst,
           directionAngle: flipY ? 0 : Math.PI,
           rotationMode: "curved"
@@ -207,9 +302,14 @@ export function spawnCurve(spawner){
         };
 
 
-          if (spawner.pickUps.length > 0){
-    enemy.dropPowerUp = spawner.pickUps.shift();
-  }
+         if (spawner.pickUps.length > 0){
+        if(spawner.pickUps[0] != 'missile'){
+          enemy.dropPowerUp = spawner.pickUps[0];
+        }else{
+          enemy.dropPowerUp = spawner.pickUps.shift();
+        }
+        
+      }
 
           spawner.pending.push({
             enemy,
@@ -222,13 +322,18 @@ export function spawnCurve(spawner){
 }
 
 export function  spawnSineCurve(spawner){
-  const img_mini = new Image();
-  img_mini.src = "./src/engine/assets/airplane5.png";
+  const img = new Image();
+  const sprites = [
+    "./src/engine/assets/airplane2_center.png",
+    "./src/engine/assets/airplane5.png",
+    "./src/engine/assets/airplane4.png"
+  ]
+  const randomIdx = Math.floor(Math.random() * sprites.length);
+  img.src = sprites[randomIdx];
+  const frames = {
+    center:img
+  }
 
-  const frameImg5 = {
-    center:img_mini,
-  };
-  
   const fromUp = Math.random() < 0.5;
   const fromUp2 = Math.random() < 0.5;
   const sides = [
@@ -248,7 +353,7 @@ export function  spawnSineCurve(spawner){
     }
       for(let i = 0; i < 4; i ++){
         const enemy = new Enemy({
-          x:side.sx, y:side.sy, w:60, h:60, game:spawner.game, frames: frameImg5,
+          x:side.sx, y:side.sy, w:60, h:60, game:spawner.game, frames: frames,
           speed:110, fireTimer: 2.7,
           pattern:Patterns.curved,
           shootingPattern:basic,
@@ -266,10 +371,15 @@ export function  spawnSineCurve(spawner){
           },
           end:{x:side.sx, y:End}
       };
-
        if (spawner.pickUps.length > 0){
-    enemy.dropPowerUp = spawner.pickUps.shift();
-  }
+        if(spawner.pickUps[0] != 'missile'){
+          enemy.dropPowerUp = spawner.pickUps[0];
+        }else{
+          enemy.dropPowerUp = spawner.pickUps.shift();
+        }
+        
+      }
+
 
       spawner.pending.push({
         enemy,
@@ -284,28 +394,34 @@ export function  spawnSineCurve(spawner){
 }
 
 export function  spawnRoller(spawner){
-  const img_mini = new Image();
-  img_mini.src = "./src/engine/assets/airplane3.png";
-
-  const frameImg5 = {
-    center:img_mini,
-  };
+  const img = new Image();
+  const sprites = [
+    "./src/engine/assets/airplane2_center.png",
+    "./src/engine/assets/airplane5.png",
+    "./src/engine/assets/airplane4.png"
+  ]
+  const randomIdx = Math.floor(Math.random() * sprites.length);
+  img.src = sprites[randomIdx];
   
-  const count = spawner.diffIdx;
-  
-  if(count > 4){
-    count = 4;
+  const frames = {
+    center:img
   }
-  const colDelay = 3.0;
+  const count = spawner.diffIdx + 1;
+  
+  if(count > 5){
+    count = 3;
+  }
+
   for(let j = 0; j < count; j++){
-    const sx = Math.random() * (spawner.game.w * 0.5 ) + spawner.game.w * 0.25;
+    const sx = Math.random() * (spawner.game.w * 0.75 ) + spawner.game.w * 0.25;
     const turn = Math.random() < 0.5;
     const fromUp = Math.random() < 0.5;
     const dirY = fromUp ? 1 : -1;
+
     for(let i = 0; i < 4; i ++){
     const sy = fromUp ? - 50 :  spawner.game.h;
     const enemy = new Enemy({
-      x:sx, y:sy, w:60, h:60, game:spawner.game, frames: frameImg5,
+      x:sx, y:sy, w:60, h:60, game:spawner.game, frames: frames,
       speed:110, fireTimer: 3,
       pattern:Patterns.roller,
       shootingPattern:basic,
@@ -322,14 +438,9 @@ export function  spawnRoller(spawner){
   end: { x: sx, y: fromUp ? spawner.game.h + 50 : -70 } // exit point
 };
 
-  if (spawner.pickUps.length > 0){
-    enemy.dropPowerUp = spawner.pickUps.shift();
-  }
-
-
   spawner.pending.push({
     enemy,
-    delay: j* colDelay + i * 0.65
+    delay: j + i * 0.65
   });
 
   }
@@ -343,18 +454,24 @@ export function  spawnRoller(spawner){
 
 export function spawnFromSide(spawner){
   const img = new Image();
-  img.src = "./src/engine/assets/airplane4.png";
-
-  const frameImgSide = {
-    center: img
-  };
+  const sprites = [
+    "./src/engine/assets/airplane2_center.png",
+    "./src/engine/assets/airplane5.png",
+    "./src/engine/assets/airplane4.png"
+  ]
+  const randomIdx = Math.floor(Math.random() * sprites.length);
+  img.src = sprites[randomIdx];
+  
+  const frames = {
+    center:img
+  }
 
   const fromRight = Math.random() < 0.5;
   const sx = -50;
   const sy = Math.random() * (spawner.game.h * 0.75 - spawner.game.h * 0.25) + spawner.game.h * 0.25;
   for(let i = 0; i < 4; i ++){
     const enemy = new Enemy({
-      x:sx, y:sy, w:60, h:60, game:spawner.game, frames: frameImgSide,
+      x:sx, y:sy, w:60, h:60, game:spawner.game, frames: frames,
       speed:130, fireTimer: 5.0, shotType: "once",
       pattern:Patterns.curved,
       shootingPattern:basic, rotationMode: "side",
@@ -371,8 +488,14 @@ export function spawnFromSide(spawner){
   };
 
     if (spawner.pickUps.length > 0){
-    enemy.dropPowerup = spawner.pickUps.shift();
-  }
+        if(spawner.pickUps[0] != 'missile'){
+          enemy.dropPowerUp = spawner.pickUps[0];
+        }else{
+          enemy.dropPowerUp = spawner.pickUps.shift();
+        }
+        
+      }
+
 
   spawner.pending.push({
     enemy,
@@ -389,7 +512,7 @@ export function spawnFromSide(spawner){
 
 
 export function miniBoss(spawner){
-  const sx = Math.random() * (spawner.game.w * 0.5);
+  const sx = Math.random() * (spawner.game.w * 0.5)
   const sy = -50;
 
   const img = new Image();
@@ -401,12 +524,16 @@ export function miniBoss(spawner){
 
   const rounds = [10, 10, 12, 16];
 
+  if(spawner.game.player.powerlvl){
+
+  }
+
   const enemy = new Enemy({
     x:sx, y:sy,w:190, h:130, hp:1000, game:spawner.game, frames:framesMini, 
     pattern:Patterns.miniBoss2,
     directionAngle:0,
     speed:90,
-    shootingPattern:burst, fireTimer:1.5, burstSpread: Math.PI/12,
+    shootingPattern:missile, fireTimer:1.5, burstSpread: Math.PI/12,
     class: "miniBoss",
     burstRounds:rounds[spawner.diffIdx],
     directionAngle: Math.PI

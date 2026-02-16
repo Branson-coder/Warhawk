@@ -6,6 +6,8 @@ const bullet2 = new Image();
 bullet2.src = 'src/engine/assets/bullet2.png';
 const bullet3 = new Image();
 bullet3.src = 'src/engine/assets/bullet3.png';
+const enemyMissile = new Image();
+enemyMissile.src = 'src/engine/assets/enemyMissile.png';
 export function spawnBullet(game, enemy, dx, dy){
      if (!game || !game.player) return;
     const ex = enemy.x + enemy.w/2;
@@ -109,20 +111,38 @@ export function burst(game, enemy){
 }
 
 export function missile(game, enemy){
-  const px = game.player.x + game.player.w/2;
-  const py = game.player.y + game.player.y/2;
 
-  let dx = px - (enemy.x + enemy.w/2);
-  let dy = py - (enemy.y + enemy.h/2);
+  const ex = enemy.x + enemy.w/2;
+  const ey = enemy.y + enemy.h/2;
 
-  const len = hypot(dy, dx) || 1;
+  const px = game.player.x + game.player.width/2;
+  const py = game.player.y + game.player.height/2;
 
+  let dx = px - ex;
+  let dy = py - ey;
+
+  const len = Math.hypot(dx, dy) || 1;
   dx /= len;
   dy /= len;
 
-  const dur = 3;
-  const speed = 200;
+  const s = 200;
   
-  
+  const b = new EnemyBullet(
+    ex - 4,
+    ey - 4,
+    dx * s,
+    dy * s,
+    enemyMissile,
+    {
+      class: "missile",
+      speed: s,
+      w: 40,
+      h: 15,
+      homing: true,
+      turnRate: 5,
+      damage : 15   
+    }
+  );
 
+  game.entities.add(b);
 }

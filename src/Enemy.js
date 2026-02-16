@@ -29,19 +29,21 @@ export default class Enemy {
     this.colourTimer = 0; this.hitTimer = 0; this.hitDuration = 0.1;
     this.original = this.colour;
     this.spritesheet = opts.spritesheet ?? null;
+    this.onDeathCalled = false;
 
     this.frames = opts.frames ?? [];
     this.frameCount = opts.frameCount ?? 1;   
     this.frame = 0;
     this.frameTimer = 0;
     this.frameRate = opts.frameRate ?? 0.1;
-    this.roate = opts.rotate ?? 0; 
+    this.rotate = opts.rotate ?? 0; 
 
     this.burstQueue = []; this.burstRounds = opts.burstRounds ?? 2;    
     this.burstInterval = 0.1; this.burstSpread = opts.Spread ?? 0;
     this.burstTimer = 0; 
 
     this.missileLife = 0;
+    this.picked = false;
 
     this.preX = this.x;
     this.preY = this.y;
@@ -204,7 +206,7 @@ export default class Enemy {
 
     }
     if(this.rotationMode != "miniBoss2" && this.class != "miniBoss"){
-      if (this.y > (game.h + this.h) || this.y < -60 || this.x > game.w + 60 || this.x < -60) this.death(game);
+      if (this.y > (game.h + 20) || this.y < -60 || this.x > game.w + 60 || this.x < -60) this.deathDespawn();
     }
     
   }
@@ -270,7 +272,7 @@ export default class Enemy {
   }
 
   onCollision(other, game){
-    if(other.type == 'player' || other.type == 'playerBullet'){
+    if(other.type == 'playerBullet'){
       this.hp -= 8;    
       this.hitTimer = this.hitDuration;
         if(this.hp <= 0){
@@ -279,8 +281,8 @@ export default class Enemy {
         }     
 
     }else if(other.type == 'playerMissile'){
-      this.hp -= 70;
-      game.entities.add(new Explosion(this.x + this.w/2 - 200, this.y + this.h/2 - 200, game.explosionImg, 400, 400, 'missile'));
+      this.hp -= 50;
+      game.entities.add(new Explosion(this.x + this.w/2 - 150, this.y + this.h/2 - 150, game.explosionImg, 300, 300, 'missile'));
       this.hitTimer = this.hitDuration;
         if(this.hp <= 0){
         game.score += 1;
@@ -291,7 +293,7 @@ export default class Enemy {
 
     if(other.type == 'explosion'){
       if(other.t == 'missile'){
-        this.hp -= 200;
+        this.hp -= 50;
         this.hitTimer = this.hitDuration;
         if(this.hp <= 0){
         game.score += 1;
@@ -302,32 +304,40 @@ export default class Enemy {
     
   }
 
-  
-  death(game){
-    if(this.isDead){
-      return;
-    }
+  _callOnDeath() {
+    if(this.onDeathCalled) return; 
+    if(this.onDeath) this.onDeath();
+    this.onDeathCalled = true;
+}
 
+  deathDespawn(){
+     if(this.isDead) return;
     this.isDead = true;
     this.despawn = true;
-    if(this.onDeath) {
-      //console.log("Calling onDeath callback");
-      this.onDeath();
-    }
+    this._callOnDeath();
+  }
+  death(game){
+    if(this.isDead) return;
+    this.isDead = true;
+    this.despawn = true;
+    this._callOnDeath();
     game.entities.add(new Explosion(this.x, this.y, game.explosionImg, this.w, this.h, 'self'));
 
-      
-
-      if(this.dropPowerUp == 'straightShot'){
+      if(game.spawner.pickUps.length > 0){
+         if(game.spawner.pickUps[0] == 'straightShot'){
            game.entities.add( new straightPower(this.x + this.w/2, this.y + this.h/2));
+           game.spawner.pickUps.shift();
            console.log("Spawning powerup");
-      }else if(this.dropPowerUp == 'health'){
+        }else if(game.spawner.pickUps[0] == 'health'){
            game.entities.add( new health(this.x + this.w/2, this.y + this.h/2));
+           game.spawner.pickUps.shift();
            console.log("Spawning powerup");
-      }else if(this.dropPowerUp == 'missile'){
+        }else if(game.spawner.pickUps[0]== 'missile'){
           game.entities.add(  new missilePower(this.x + this.w/2, this.y + this.h/2));
+          game.spawner.pickUps.shift();
+        }  
       }
-   
+      
 
 
   }

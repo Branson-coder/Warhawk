@@ -8,7 +8,7 @@ export class Explosion{
         this.frame = 0;
         this.maxFrame = 16;
         this.timer = 0;
-        this.inter = 0.01;
+        this.inter = 0.03;
         this.images = img;
         this.collider = Collider;
         this.despawn = false;

@@ -3,6 +3,10 @@ export function straight(en, dt, game){
   en.y += en.vy * en.speed * dt;
 }
 
+export function horizontal(en, dt, game){
+  en.x += en.vx * en.speed * dt;
+}
+
 export function diagonal(en, dt, game) {
   en.x += en.diag.vx * dt;
   en.y += en.diag.vy * dt;

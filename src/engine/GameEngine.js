@@ -103,7 +103,7 @@ export default class Game{
     ctx.fillStyle = "white";
     ctx.font = "12px monospace";
     ctx.fillText(
-        `${hpRatio * 100}%`,
+        `${Math.floor(hpRatio * 100)}%`,
         barX + barW + 8,
         barY + 12
     );

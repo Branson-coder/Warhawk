@@ -8,6 +8,6 @@ export class health extends powerUp{
     }
     
     apply(player){
-        player.hp = Math.min(player.hp + 15, player.maxHp);
+        player.hp = Math.min(player.hp + 20, player.maxHp);
     }
 }

@@ -37,7 +37,7 @@ export default class Player {
             [-21, -15, -3, 11, 17]
         ];
 
-        this.missileCount = 0;
+        this.missileCount = 100;
         this.missileCoolDown = 0.6;
         this.missileTimer = 0;
 
@@ -144,8 +144,21 @@ export default class Player {
     onCollision(other, game){
         if(other.type == 'enemyBullet'){
             other.despawn = true;
-            this.hp -= 0;
+            this.hp -= 6;
             
+        }
+        if(other.type == 'enemy'){
+            if(other.class != "miniBoss"){
+                other.hp -= 1000;
+                if(other.hp <= 0){
+                    game.score += 1;
+                    other.death(game);
+                }
+                this.hp -= 15;
+            }else{
+                this.hp -= 15;
+                other.hitTimer = other.hitDuration;
+            }
         }
         if(this.hp <= 0) this.despawn = true;
     }

@@ -11,9 +11,10 @@ export default class Spawner {
 
     this.powerUp = new powerUp();
     this.nextShotidx = 0;
-    this.straights = [5, 25, 65, 90];
-    this.nextHealthScore = 9;
-    this.nextMissileScore = 2;
+    this.straights = [10, 35, 65, 90];
+    this.nextHealthScore = 5;
+    this.nextMissileScore = 10;
+    this.picked = true;
 
 
     this.nextMiniBoss = 10;
@@ -43,7 +44,6 @@ export default class Spawner {
    if(!this.currPattern) {
     //console.log("currPattern is null so calling startPattern");
     this.startPattern();
-    this.patternTimer = 0;
    }
   
    if(this.activeEnemies == 0 && this.pending.length == 0){
@@ -55,16 +55,18 @@ export default class Spawner {
   if(this.game.score >= this.straights[this.nextShotidx]){
     this.pickUps.push('straightShot');
     this.nextShotidx = Math.min(this.nextShotidx + 1, this.straights.length);
+    this.picked = false;
   }
 
   if(this.game.score >= this.nextHealthScore){
     this.pickUps.push('health');
     this.nextHealthScore += 9;
+    this.picked = false;
   }
 
   if(this.game.score >= this.nextMissileScore){
     this.pickUps.push('missile');
-    this.nextHealthScore += 2;
+    this.nextMissileScore *= 2;
   }
 
 
@@ -76,22 +78,135 @@ export default class Spawner {
     let pick = 0;
     if(this.game.score > 0 && this.game.score >= this.nextMiniBoss){
       console.log("spawning miniBoss now");
-      pick = funcs.miniBoss;
-      this.currPattern = pick;
-      this.patternDur = pick(this);
-
-      this.nextMiniBoss += 15;
-    }else{
-      const availablePatterns = this.patternBook.filter(
-      p => p !== funcs.miniBoss
-    );
-      pick = funcs.spawnStraight; 
-      //availablePatterns[Math.floor(Math.random() * availablePatterns.length)];
-      this.currPattern = pick;
-      this.patternDur = pick(this);
+      this.nextMiniBoss *= 2.5 ;
+      if(this.game.score < 1){
+        pick = funcs.miniBoss;
+        this.currPattern = pick;
+        funcs.miniBoss(this);
+      }else if(this.game.score <= 40){
+        pick= funcs.miniBoss;
+        this.currPattern = pick;
+        funcs.miniBoss(this);
+      }else{
+        pick= funcs.miniBoss;
+        this.currPattern = pick;
+        funcs.miniBoss(this);
+        funcs.miniBoss2(this);
+      }
+      
+     
+      return;
     }
 
-  } 
+      if(this.game.score < 10){
+        const pool = [
+          funcs.spawnDiagonal,
+          funcs.spawnHori,
+          funcs.spawnStraight,
+          funcs.spawnHeli
+        ]
+
+        pick = pool[Math.floor(Math.random() * pool.length)];
+        this.currPattern = pick;
+        pick(this);
+        return; 
+
+      }
+
+      if(this.game.score < 25){
+          const pool = [
+          funcs.spawnDiagonal,
+          funcs.spawnHori,
+          funcs.spawnHeli,
+          funcs.spawnFromSide,
+          funcs.spawnCurve,
+          funcs.spawnRoller,
+          funcs.spawnSineCurve
+        ]
+
+        pick = pool[Math.floor(Math.random() * pool.length)];
+        this.currPattern = pick;
+        pick(this); 
+        return; 
+      }
+
+
+      if(this.game.score < 50){
+         const combo = Math.random();
+
+         if(combo < 0.3){
+          funcs.spawnCurve(this);
+          funcs.spawnHori(this);
+          this.currPattern = funcs.spawnCurve;
+
+          return;
+         }
+          if(combo < 0.6){
+          funcs.spawnStraight(this);
+          funcs.spawnFromSide(this);
+          this.currPattern = funcs.spawnDiagonal;
+
+          return;
+         }
+
+         const pool = [
+          funcs.spawnHeli,
+          funcs.spawnRoller,
+          funcs.spawnSineCurve,
+          funcs.spawnStraight
+        ];
+
+        const pick = pool[Math.floor(Math.random() * pool.length)];
+
+        this.currPattern = pick;
+        pick(this);
+        return;
+          
+      }
+
+      if(this.game.score >= 50){
+         const combo = Math.random();
+
+         if(combo < 0.25){
+          funcs.spawnCurve(this);
+          funcs.spawnHori(this);
+          this.currPattern = funcs.spawnCurve;
+
+          return;
+         }
+          if(combo < 0.5){
+          const heli = Math.random() < 0.5;
+          if(heli){
+            funcs.spawnHeli(this);
+            funcs.spawnFromSide(this)
+          }else{
+
+          
+            funcs.spawnStraight(this);
+            funcs.spawnFromSide(this);
+          }
+          this.currPattern = funcs.spawnFromSide;
+
+          return;
+         }
+
+         if(combo < 0.75){
+          funcs.spawnSineCurve(this);
+          funcs.spawnStraight(this);
+          this.currPattern = funcs.spawnStraight;
+
+          return;
+         }
+
+         if(combo < 1){
+          funcs.spawnRoller(this);
+          this.currPattern = funcs.spawnHeli;
+
+          return;
+         }
+      }
+      
+    }
 
   spawnPending(dt){
       for(let i = this.pending.length - 1; i >= 0; i--){
@@ -113,7 +228,7 @@ export default class Spawner {
 
   updateEnemyNum(){
   if(this.game.score > 0 && this.game.score >= this.levelScore){
-    this.levelScore += 10;
+    this.levelScore += 15 + this.diffIdx * 20;
     this.diffIdx++;
     this.diffIdx = Math.min(this.diffIdx, 3);
   }
