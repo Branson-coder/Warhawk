@@ -130,6 +130,9 @@ export function spawnHori(spawner){
   }
   
 }
+    
+  
+
 
 export function spawnDiagonal(spawner){
   const img = new Image();
@@ -533,7 +536,7 @@ export function miniBoss(spawner){
     pattern:Patterns.miniBoss2,
     directionAngle:0,
     speed:90,
-    shootingPattern:missile, fireTimer:1.5, burstSpread: Math.PI/12,
+    shootingPattern:burst, fireTimer:1.5, burstSpread: Math.PI/12,
     class: "miniBoss",
     burstRounds:rounds[spawner.diffIdx],
     directionAngle: Math.PI

@@ -1,13 +1,18 @@
 import Collider from "./Collider.js";
 export default class powerUp{
-    constructor(x, y, sprite, w, h){
+    constructor(x, y, sprite, w, h, t){
         this.x = x; this.y = y;
+        this.t = t;
         this.baseY = y; this.time = 0;
         this.w = w; this.h = h;
         this.type = 'powerUp';
         this.despawn = false;
         this.collider = Collider;
         this.sprite = sprite;
+        this.bulletPowerUpSound = new Audio("src/engine/assets/reload.mp3");
+        this.bulletPowerUpSound.volume = 0.3;
+        this.healthSound = new Audio("src/engine/assets/health.mp3")
+        this.healthSound.volume = 1;
     }
     
     update(dt){
@@ -36,7 +41,15 @@ export default class powerUp{
     onCollision(other, game){
         if(other.type == 'player'){
             this.apply(game.player);
+            if(this.t == "bulletPowerUp"){
+                this.bulletPowerUpSound.play();
+           }else if(this.t == "health"){
+                this.healthSound.currentTime = 0.04
+                this.healthSound.play();
+            }
             this.despawn = true;
+
+           
         }
     }
 };

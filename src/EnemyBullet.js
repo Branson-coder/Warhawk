@@ -54,11 +54,10 @@ export default class EnemyBullet{
         if (this.smokeTimer > 0.03) {
         this.smokeTimer = 0;
     
-    
-        game.entities.add(new SmokeParticle(this.x + this.w/2, this.y - this.h));  
+        
+        game.entities.add(new SmokeParticle(this.x + this.w, ));  
     }
   } else {
-    // For non-homing bullets, still track angle
     this.angle = Math.atan2(this.vy, this.vx);
   }
 
@@ -68,7 +67,6 @@ export default class EnemyBullet{
 
     draw(ctx){
         if(this.homing){
-            // Draw rotated sprite for homing missiles
             ctx.save();
             ctx.translate(this.x + this.w/2, this.y + this.h/2);
             ctx.rotate(this.angle);
@@ -98,7 +96,9 @@ export default class EnemyBullet{
         }
 
         if(other.type == 'player'){
+            if(this.class == 'missile'){
             game.entities.add(new Explosion(this.x, this.y, game.explosionImg, 30, 30, 'self'));
+            }
         }
     }
 }

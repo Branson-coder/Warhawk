@@ -30,6 +30,10 @@ export default class Enemy {
     this.original = this.colour;
     this.spritesheet = opts.spritesheet ?? null;
     this.onDeathCalled = false;
+    this.deathSound = new Audio("src/engine/assets/explosionSound.mp3");
+    this.deathSound.volume = 0.3;
+    this.hitSound = new Audio("src/engine/assets/metalHit.mp3");
+    this.hitSound.volume = 0.15;
 
     this.frames = opts.frames ?? [];
     this.frameCount = opts.frameCount ?? 1;   
@@ -272,9 +276,12 @@ export default class Enemy {
   }
 
   onCollision(other, game){
+    if(this.isDead) return; 
     if(other.type == 'playerBullet'){
       this.hp -= 8;    
       this.hitTimer = this.hitDuration;
+      this.hitSound.currentTime = 0;
+      this.hitSound.play();
         if(this.hp <= 0){
         game.score += 1;
         this.death(game);
@@ -322,7 +329,7 @@ export default class Enemy {
     this.despawn = true;
     this._callOnDeath();
     game.entities.add(new Explosion(this.x, this.y, game.explosionImg, this.w, this.h, 'self'));
-
+    this.deathSound.play();
       if(game.spawner.pickUps.length > 0){
          if(game.spawner.pickUps[0] == 'straightShot'){
            game.entities.add( new straightPower(this.x + this.w/2, this.y + this.h/2));

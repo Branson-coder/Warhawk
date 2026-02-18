@@ -37,7 +37,7 @@ export default class Player {
             [-21, -15, -3, 11, 17]
         ];
 
-        this.missileCount = 100;
+        this.missileCount = 0;
         this.missileCoolDown = 0.6;
         this.missileTimer = 0;
 
@@ -105,7 +105,7 @@ export default class Player {
                     -500
                 )
             );
-             this.gunShot.currentTime = 0.09;
+             this.gunShot.currentTime = 0.1;
              this.gunShot.play();
         });
 
