@@ -25,6 +25,7 @@ export default class Player {
         this.snippetstart
 
         this.depsawn = false;
+        this.onDeath = null;
         this.collider = Collider;
 
         this.powerUp = powerUp;
@@ -145,7 +146,6 @@ export default class Player {
         if(other.type == 'enemyBullet'){
             other.despawn = true;
             this.hp -= 6;
-            
         }
         if(other.type == 'enemy'){
             if(other.class != "miniBoss"){
@@ -160,7 +160,11 @@ export default class Player {
                 other.hitTimer = other.hitDuration;
             }
         }
-        if(this.hp <= 0) this.despawn = true;
+        if(this.hp <= 0){ 
+        this.despawn = true;
+         if (this.onDeath) {
+            this.onDeath();
+        }}
     }
     
 }   

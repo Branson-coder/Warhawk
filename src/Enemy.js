@@ -46,7 +46,8 @@ export default class Enemy {
     this.burstInterval = 0.1; this.burstSpread = opts.Spread ?? 0;
     this.burstTimer = 0; 
 
-    this.missileLife = 0;
+    this.missileLife = 0
+    this.explosionDamaged = false;
     this.picked = false;
 
     this.preX = this.x;
@@ -288,7 +289,7 @@ export default class Enemy {
         }     
 
     }else if(other.type == 'playerMissile'){
-      this.hp -= 50;
+      this.hp -= 60;
       game.entities.add(new Explosion(this.x + this.w/2 - 150, this.y + this.h/2 - 150, game.explosionImg, 300, 300, 'missile'));
       this.hitTimer = this.hitDuration;
         if(this.hp <= 0){
@@ -298,9 +299,10 @@ export default class Enemy {
 
     }
 
-    if(other.type == 'explosion'){
+    if(other.type == 'explosion' && !this.explosionDamaged ){
       if(other.t == 'missile'){
-        this.hp -= 50;
+        this.explosionDamaged = true;
+        this.hp -= 60;
         this.hitTimer = this.hitDuration;
         if(this.hp <= 0){
         game.score += 1;

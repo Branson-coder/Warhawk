@@ -7,19 +7,18 @@ export default class Spawner {
     this.script = [];
     this.currPattern = null;
     this.patternTimer = 0;
-    this.patternDur = 0;
 
     this.powerUp = new powerUp();
     this.nextShotidx = 0;
-    this.straights = [0, 35, 65, 90];
-    this.nextHealthScore = 0;
+    this.straights = [8, 35, 65, 90];
+    this.nextHealthScore = 9;
     this.nextMissileScore = 10;
     this.picked = true;
 
 
-    this.nextMiniBoss = 1;
+    this.nextMiniBoss = 10;
     this.diffIdx = 0;
-    this.levelScore = 10;
+    this.levelScore = [10, 25, 40];
    
     this.pickUps = [];
     this.pending = [];
@@ -28,7 +27,7 @@ export default class Spawner {
 
     console.log(funcs);
     console.log(this.patternBook);
-//console.log(typeof this.patternBook[0]); // should print "function"
+
   }
 
 
@@ -60,13 +59,13 @@ export default class Spawner {
 
   if(this.game.score >= this.nextHealthScore){
     this.pickUps.push('health');
-    this.nextHealthScore += 9;
+    this.nextHealthScore += 10;
     this.picked = false;
   }
 
   if(this.game.score >= this.nextMissileScore){
     this.pickUps.push('missile');
-    this.nextMissileScore *= 2;
+    this.nextMissileScore *= 2.5;
   }
 
 
@@ -77,8 +76,8 @@ export default class Spawner {
     this.patternTimer = 0;
     let pick = 0;
     if(this.game.score > 0 && this.game.score >= this.nextMiniBoss){
+      this.nextMiniBoss *= 2;
       console.log("spawning miniBoss now");
-      this.nextMiniBoss += 2 ;
       if(this.game.score < 1){
         pick = funcs.miniBoss;
         this.currPattern = pick;
@@ -100,6 +99,7 @@ export default class Spawner {
 
       if(this.game.score < 10){
         const pool = [
+          funcs.spawnCurve,
           funcs.spawnDiagonal,
           funcs.spawnCurve,
           funcs.spawnHori,
@@ -118,12 +118,12 @@ export default class Spawner {
           const pool = [
           funcs.spawnDiagonal,
           funcs.spawnHori,
+          funcs.spawnSineCurve,
           funcs.spawnHeli,
+          funcs.spawnRoller,
           funcs.spawnFromSide,
           funcs.spawnCurve,
           funcs.spawnRoller,
-          funcs.spawnRoller,
-          funcs.spawnSineCurve,
           funcs.spawnSineCurve
         ]
 
@@ -134,7 +134,7 @@ export default class Spawner {
       }
 
 
-      if(this.game.score < 50){
+      if(this.game.score < 40){
          const combo = Math.random();
 
          if(combo < 0.3){
@@ -152,8 +152,10 @@ export default class Spawner {
           return;
          }
 
+
          const pool = [
           funcs.spawnHeli,
+          funcs.spawnRoller,
           funcs.spawnRoller,
           funcs.spawnSineCurve,
         ];
@@ -166,7 +168,7 @@ export default class Spawner {
           
       }
 
-      if(this.game.score >= 50){
+      if(this.game.score >= 40){
          const combo = Math.random();
 
          if(combo < 0.25){
@@ -229,11 +231,16 @@ export default class Spawner {
   };
 
   updateEnemyNum(){
-  if(this.game.score > 0 && this.game.score >= this.levelScore){
-    this.levelScore += 15 + this.diffIdx * 20;
+  if(this.game.score > 0 && this.game.score >= this.levelScore[this.diffIdx]){
     this.diffIdx++;
     this.diffIdx = Math.min(this.diffIdx, 3);
   }
+}
+
+stopSpawning(){
+  this.pending = [];
+  this.activeEnemies = Infinity;
+  this.currPattern = funcs.spawnStraight;
 }
 
 }

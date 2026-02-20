@@ -9,6 +9,9 @@ export default class MenuScreen {
         this.active = true;
         this.screen = 'main'; // 'main' | 'help'
         this.time   = 0;
+        this.click = new Audio("./src/engine/assets/click.mp3");
+        this.click.volume = 1.0;
+
 
         this.buttons = {
             main: [
@@ -124,6 +127,8 @@ export default class MenuScreen {
 
     _onClick(e) {
         if (!this.active) return;
+        this.click.currentTime = 0.07;
+        this.click.play();
         const r  = this.canvas.getBoundingClientRect();
         const mx = (e.clientX - r.left) * (this.w / r.width);
         const my = (e.clientY - r.top)  * (this.h / r.height);

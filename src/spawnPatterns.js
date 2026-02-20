@@ -236,7 +236,7 @@ export function spawnHeli(spawner){
             }
             
             const timerFire = [2.0, 1.0, 1.0, 1.0];
-            const speed = [120, 130, 135, 135];
+            const speed = [120, 135, 140, 140];
             
             
             let startX1 = 0; let flip = 1;
@@ -275,7 +275,6 @@ export function spawnCurve(spawner){
   const sprites = [
     "./src/engine/assets/airplane2_center.png",
     "./src/engine/assets/airplane5.png",
-    "./src/engine/assets/airplane4.png"
   ]
   const randomIdx = Math.floor(Math.random() * sprites.length);
   img.src = sprites[randomIdx];
@@ -329,7 +328,6 @@ export function  spawnSineCurve(spawner){
   const sprites = [
     "./src/engine/assets/airplane2_center.png",
     "./src/engine/assets/airplane5.png",
-    "./src/engine/assets/airplane4.png"
   ]
   const randomIdx = Math.floor(Math.random() * sprites.length);
   img.src = sprites[randomIdx];
@@ -401,7 +399,6 @@ export function  spawnRoller(spawner){
   const sprites = [
     "./src/engine/assets/airplane2_center.png",
     "./src/engine/assets/airplane5.png",
-    "./src/engine/assets/airplane4.png"
   ]
   const randomIdx = Math.floor(Math.random() * sprites.length);
   img.src = sprites[randomIdx];
@@ -409,7 +406,7 @@ export function  spawnRoller(spawner){
   const frames = {
     center:img
   }
-  const count = spawner.diffIdx + 1;
+  const count = spawner.diffIdx;
   
   if(count > 5){
     count = 3;
@@ -460,7 +457,6 @@ export function spawnFromSide(spawner){
   const sprites = [
     "./src/engine/assets/airplane2_center.png",
     "./src/engine/assets/airplane5.png",
-    "./src/engine/assets/airplane4.png"
   ]
   const randomIdx = Math.floor(Math.random() * sprites.length);
   img.src = sprites[randomIdx];
@@ -469,10 +465,12 @@ export function spawnFromSide(spawner){
     center:img
   }
 
+  const count = [4, 5, 6, 6]
+
   const fromRight = Math.random() < 0.5;
   const sx = -50;
   const sy = Math.random() * (spawner.game.h * 0.75 - spawner.game.h * 0.25) + spawner.game.h * 0.25;
-  for(let i = 0; i < 4; i ++){
+  for(let i = 0; i < count[spawner.diffIdx]; i ++){
     const enemy = new Enemy({
       x:sx, y:sy, w:60, h:60, game:spawner.game, frames: frames,
       speed:130, fireTimer: 5.0, shotType: "once",
@@ -527,12 +525,9 @@ export function miniBoss(spawner){
 
   const rounds = [10, 10, 12, 16];
 
-  if(spawner.game.player.powerlvl){
-
-  }
 
   const enemy = new Enemy({
-    x:sx, y:sy,w:190, h:130, hp:1000, game:spawner.game, frames:framesMini, 
+    x:sx, y:sy,w:190, h:130, hp:1500, game:spawner.game, frames:framesMini, 
     pattern:Patterns.miniBoss2,
     directionAngle:0,
     speed:90,
