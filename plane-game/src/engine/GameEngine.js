@@ -31,13 +31,13 @@ export default class Game{
         this.explosionImg = [];
         for(let i = 1; i <= 16; i++){
             const temp = new Image();
-            temp.src = `./src/engine/assets/explosions/${i}.png`;
+            temp.src = `/Warhawk/assets/explosions/${i}.png`;
             this.explosionImg.push(temp);
         }
 
         this.missileImage = new Image();
-        this.missileImage.src = "./src/engine/assets/missilePickUp.png";
-        this.bgm = new Audio("./src/engine/assets/bgm.mp3");
+        this.missileImage.src = "/Warhawk/assets/missilePickUp.png";
+        this.bgm = new Audio("/Warhawk/assets/bgm.mp3");
         this.bgm.loop = true;
         this.music = false;
 

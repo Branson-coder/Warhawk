@@ -20,7 +20,7 @@ export default class Player {
 
         this.fireRate = 0.12; this.fireTime = 0; 
 
-        this.gunShot = new Audio('./src/engine/assets/playershot.mp3');
+        this.gunShot = new Audio('/Warhawk/assets/playershot.mp3');
         this.gunShot.volume = 0.1;
         this.snippetstart
 
@@ -44,11 +44,11 @@ export default class Player {
 
 
         this.center = new Image();
-        this.center.src = "./src/engine/assets/player_center.png";
+        this.center.src = "/Warhawk/assets/player_center.png";
         this.rightSprite = new Image();
-        this.rightSprite.src = "./src/engine/assets/player_right.png";
+        this.rightSprite.src = "/Warhawk/assets/player_right.png";
         this.leftSprite = new Image();
-        this.leftSprite.src = "./src/engine/assets/player_left.png";
+        this.leftSprite.src = "/Warhawk/assets/player_left.png";
 
         this.currentSprite = this.center;
     }

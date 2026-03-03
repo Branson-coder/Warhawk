@@ -1,13 +1,13 @@
 import EnemyBullet from "./EnemyBullet.js";
 
 const bullet1 = new Image();
-bullet1.src = './src/engine/assets/bullet1.png';
+bullet1.src = '/Warhawk/assets/bullet1.png';
 const bullet2 = new Image();
-bullet2.src = 'src/engine/assets/bullet2.png';
+bullet2.src = '/Warhawk/assets/bullet2.png';
 const bullet3 = new Image();
-bullet3.src = 'src/engine/assets/bullet3.png';
+bullet3.src = '/Warhawk/assets/bullet3.png';
 const enemyMissile = new Image();
-enemyMissile.src = 'src/engine/assets/enemyMissile.png';
+enemyMissile.src = '/Warhawk/assets/enemyMissile.png';
 export function spawnBullet(game, enemy, dx, dy){
      if (!game || !game.player) return;
     const ex = enemy.x + enemy.w/2;

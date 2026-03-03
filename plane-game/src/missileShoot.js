@@ -12,7 +12,7 @@ export class missileShoot{
         
         this.smokeTimer = 0;
         this.img = new Image();
-        this.img.src = "./src/engine/assets/missile.png";
+        this.img.src = "/Warhawk/assets/missile.png";
         this.collider =  Collider;
     }
 

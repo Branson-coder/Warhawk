@@ -9,9 +9,9 @@ import EnemyBullet from "./EnemyBullet.js";
 export function spawnStraight(spawner){
   const img = new Image();
   const sprites = [
-    "./src/engine/assets/sineCurve.png",
-    "./src/engine/assets/straight.png",
-    "./src/engine/assets/horizontal.png"
+    "/Warhawk/assets/sineCurve.png",
+    "/Warhawk/assets/straight.png",
+    "/Warhawk/assets/horizontal.png"
   ]
   const randomIdx = Math.floor(Math.random() * sprites.length);
   img.src = sprites[randomIdx];
@@ -70,9 +70,9 @@ export function spawnStraight(spawner){
 export function spawnHori(spawner){
   const img = new Image();
   const sprites = [
-    "./src/engine/assets/sineCurve.png",
-    "./src/engine/assets/straight.png",
-    "./src/engine/assets/horizontal.png"
+    "/Warhawk/assets/sineCurve.png",
+    "/Warhawk/assets/straight.png",
+    "/Warhawk/assets/horizontal.png"
   ]
   const randomIdx = Math.floor(Math.random() * sprites.length);
   img.src = sprites[randomIdx];
@@ -137,9 +137,9 @@ export function spawnHori(spawner){
 export function spawnDiagonal(spawner){
   const img = new Image();
   const sprites = [
-    "./src/engine/assets/sineCurve.png",
-    "./src/engine/assets/straight.png",
-    "./src/engine/assets/horizontal.png"
+    "/Warhawk/assets/sineCurve.png",
+    "/Warhawk/assets/straight.png",
+    "/Warhawk/assets/horizontal.png"
   ]
   const randomIdx = Math.floor(Math.random() * sprites.length);
   img.src = sprites[randomIdx];
@@ -231,7 +231,7 @@ export function spawnHeli(spawner){
      const frameImg1 = [];
             for(let i = 1; i <= 5; i++){
                 const img = new Image();
-                img.src = `./src/engine/assets/heli${i}.png`;
+                img.src = `/Warhawk/assets/heli${i}.png`;
                 frameImg1.push(img);
             }
             
@@ -273,8 +273,8 @@ export function spawnHeli(spawner){
 export function spawnCurve(spawner){
   const img = new Image();
   const sprites = [
-    "./src/engine/assets/airplane2_center.png",
-    "./src/engine/assets/airplane5.png",
+    "/Warhawk/assets/airplane2_center.png",
+    "/Warhawk/assets/airplane5.png",
   ]
   const randomIdx = Math.floor(Math.random() * sprites.length);
   img.src = sprites[randomIdx];
@@ -326,8 +326,8 @@ export function spawnCurve(spawner){
 export function  spawnSineCurve(spawner){
   const img = new Image();
   const sprites = [
-    "./src/engine/assets/airplane2_center.png",
-    "./src/engine/assets/airplane5.png",
+     "/Warhawk/assets/airplane2_center.png",
+    "/Warhawk/assets/airplane5.png",
   ]
   const randomIdx = Math.floor(Math.random() * sprites.length);
   img.src = sprites[randomIdx];
@@ -397,8 +397,8 @@ export function  spawnSineCurve(spawner){
 export function  spawnRoller(spawner){
   const img = new Image();
   const sprites = [
-    "./src/engine/assets/airplane2_center.png",
-    "./src/engine/assets/airplane5.png",
+     "/Warhawk/assets/airplane2_center.png",
+    "/Warhawk/assets/airplane5.png",
   ]
   const randomIdx = Math.floor(Math.random() * sprites.length);
   img.src = sprites[randomIdx];
@@ -455,8 +455,8 @@ export function  spawnRoller(spawner){
 export function spawnFromSide(spawner){
   const img = new Image();
   const sprites = [
-    "./src/engine/assets/airplane2_center.png",
-    "./src/engine/assets/airplane5.png",
+     "/Warhawk/assets/airplane2_center.png",
+    "/Warhawk/assets/airplane5.png",
   ]
   const randomIdx = Math.floor(Math.random() * sprites.length);
   img.src = sprites[randomIdx];
@@ -517,7 +517,7 @@ export function miniBoss(spawner){
   const sy = -50;
 
   const img = new Image();
-  img.src = "./src/engine/assets/boss.png"
+  img.src = "/Warhawk/assets/boss.png"
 
   const framesMini = {
     center: img
@@ -550,7 +550,7 @@ export function miniBoss(spawner){
 
 export function miniBoss2(spawner){
   const miniBoss2img = new Image();
-  miniBoss2img.src = "./src/engine/assets/boss2.png";
+  miniBoss2img.src = "/Warhawk/assets/boss2.png";
 
   const frameMini2 ={
     center:miniBoss2img
