@@ -30,9 +30,9 @@ export default class Enemy {
     this.original = this.colour;
     this.spritesheet = opts.spritesheet ?? null;
     this.onDeathCalled = false;
-    this.deathSound = new Audio("src/engine/assets/explosionSound.mp3");
+    this.deathSound = new Audio("/Warhawk/assets/explosionSound.mp3");
     this.deathSound.volume = 0.3;
-    this.hitSound = new Audio("src/engine/assets/metalHit.mp3");
+    this.hitSound = new Audio("/Warhawk/assets/metalHit.mp3");
     this.hitSound.volume = 0.15;
 
     this.frames = opts.frames ?? [];

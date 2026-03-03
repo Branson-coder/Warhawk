@@ -9,7 +9,7 @@ export default class Bullet{
         this.collider = Collider;
 
         this.bulletSprite = new Image();
-        this.bulletSprite.src = "./src/engine/assets/Bullets.png";
+        this.bulletSprite.src = "/Warhawk/assets/Bullets.png";
 
         this.currSprite = this.bulletSprite;
     }
