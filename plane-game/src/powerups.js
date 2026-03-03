@@ -9,9 +9,9 @@ export default class powerUp{
         this.despawn = false;
         this.collider = Collider;
         this.sprite = sprite;
-        this.bulletPowerUpSound = new Audio("src/engine/assets/reload.mp3");
+        this.bulletPowerUpSound = new Audio("/Warhawk/assets/reload.mp3");
         this.bulletPowerUpSound.volume = 0.3;
-        this.healthSound = new Audio("src/engine/assets/health.mp3")
+        this.healthSound = new Audio("/Warhawk/assets/health.mp3")
         this.healthSound.volume = 1;
     }
     
