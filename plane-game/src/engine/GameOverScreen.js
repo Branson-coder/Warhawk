@@ -83,8 +83,7 @@ export default class GameOverScreen {
         const my = (e.clientY - r.top) * (this.h / r.height);
         if (this._hit(mx, my)) {
             this.destroy();
-            // Reset game and return to menu
-            window.location.reload();
+            this.game.returnToMenu();
         }
     }
 

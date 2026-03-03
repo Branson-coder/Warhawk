@@ -43,12 +43,40 @@ export default class Game{
 
         this.menu = new MenuScreen(canvas, ctx, this);
         this._menuLoop = this._menuLoop.bind(this);
-        requestAnimationFrame(this._menuLoop);  
+        this._initGameState();
+        this._startMenuLoop();
+    }
+
+        _initGameState() {
+        this.input          = new Input();
+        this.score          = 0;
+        this.phase          = "menu";
+        this.running        = false;
+        this.lastTime       = 0;
+        this.gameOverScreen = null;
+        this.entities       = new EntityManager();
+        this.spawner        = new spawner(this);
+        this.player         = new Player(this.w, this.h, this);
+        this.entities.add(this.player);
+        this.background     = new Background();
+    }
+
+    _startMenuLoop() {
+        this.menu = new MenuScreen(this.canvas, this.ctx, this);
+        this._menuLastTime = 0;
+        requestAnimationFrame(this._menuLoop);
+    }
+
+    returnToMenu() {
+        this.running        = false;
+        this.gameOverScreen = null;
+        this._initGameState();
+        this._startMenuLoop();
     }
 
     _menuLoop(timeStamp) {
 
-        if (!this.menu.active) return;             // Game.start() was called — stop
+        if (!this.menu.active) return;             
         const dt = Math.min((timeStamp - (this._menuLastTime || timeStamp)) / 1000, 0.05);
         this._menuLastTime = timeStamp;
 
