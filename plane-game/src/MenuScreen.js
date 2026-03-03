@@ -9,7 +9,7 @@ export default class MenuScreen {
         this.active = true;
         this.screen = 'main'; // 'main' | 'help'
         this.time   = 0;
-        this.click = new Audio("./Warhawk/assets/click.mp3");
+        this.click = new Audio("/Warhawk/assets/click.mp3");
         this.click.volume = 1.0;
 
 

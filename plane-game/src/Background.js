@@ -34,7 +34,7 @@ export default class Background{
     constructor(){
         this.y = 0;
         this.backgroundImg = new Image();
-        this.backgroundImg.src = "./src/engine/assets/background.png";
+        this.backgroundImg.src = "/Warhawk/assets/background.png";
         this.speed = 70;
 
         this.clouds = Array.from({ length: 7 }, () => ({
