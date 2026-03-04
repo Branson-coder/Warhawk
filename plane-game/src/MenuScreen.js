@@ -138,7 +138,7 @@ export default class MenuScreen {
             case 'start': this.destroy(); this.game.start(); break;
             case 'help':  this.screen = 'help'; this.hoveredBtn = null; break;
             case 'back':  this.screen = 'main'; this.hoveredBtn = null; break;
-            case 'exit':  window.location.href = "https://Branson-coder.github.io/Warhawk"; break;
+            case 'exit':  window.location.href = "https://github.com/Branson-coder"; break;
         }
     }
 
